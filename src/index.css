@@ -157,4 +157,12 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  * {
+    scroll-behavior: smooth;
+  }
+
+  button, a, input, select {
+    @apply transition-colors duration-200;
+  }
 }

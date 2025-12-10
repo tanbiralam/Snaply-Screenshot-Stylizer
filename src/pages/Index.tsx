@@ -31,17 +31,17 @@ const Index = () => {
     setActivePreset(null);
   };
 
-  const handleExport = () => {
-    return canvasRef.current?.exportImage() ?? null;
+  const handleExport = (format: 'png' | 'jpeg' | 'webp') => {
+    return canvasRef.current?.exportImage(format) ?? null;
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-20">
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-20 animate-slide-down">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 shadow-sm hover:shadow-md transition-shadow">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -155,7 +155,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 mt-12 py-6">
+      <footer className="border-t border-border/30 mt-12 py-6 animate-fade-in">
         <p className="text-center text-xs text-muted-foreground">
           Free to use • No login required • Local processing only
         </p>

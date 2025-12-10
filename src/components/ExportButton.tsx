@@ -1,61 +1,179 @@
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, CheckCircle2, FileImage, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface ExportButtonProps {
-  onExport: () => string | null;
+  onExport: (format: 'png' | 'jpeg' | 'webp') => string | null;
   disabled?: boolean;
 }
 
+type ExportFormat = 'png' | 'jpeg' | 'webp';
+
+interface FormatOption {
+  value: ExportFormat;
+  label: string;
+  description: string;
+  extension: string;
+}
+
+const formatOptions: FormatOption[] = [
+  {
+    value: 'png',
+    label: 'PNG',
+    description: 'Lossless, best quality',
+    extension: 'png',
+  },
+  {
+    value: 'jpeg',
+    label: 'JPEG',
+    description: 'Smaller file size',
+    extension: 'jpg',
+  },
+  {
+    value: 'webp',
+    label: 'WebP',
+    description: 'Modern, balanced',
+    extension: 'webp',
+  },
+];
+
 export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('png');
+  const [lastExported, setLastExported] = useState<ExportFormat | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleExport = async () => {
+  const handleExport = async (format: ExportFormat) => {
     if (disabled) {
-      toast.error('Please upload an image first');
+      toast.error('Please upload an image first', {
+        description: 'You need to upload a screenshot before downloading',
+      });
       return;
     }
 
     setIsExporting(true);
+    setDropdownOpen(false);
     
-    // Small delay for UX
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 400));
     
-    const dataUrl = onExport();
+    const dataUrl = onExport(format);
     if (!dataUrl) {
-      toast.error('Failed to export image');
+      toast.error('Failed to export image', {
+        description: 'Something went wrong while generating the image',
+      });
       setIsExporting(false);
       return;
     }
 
     const link = document.createElement('a');
-    link.download = `beautified-${Date.now()}.png`;
+    const formatOption = formatOptions.find(f => f.value === format);
+    link.download = `beautified-${Date.now()}.${formatOption?.extension || 'png'}`;
     link.href = dataUrl;
     link.click();
     
-    toast.success('Image downloaded!');
+    setLastExported(format);
+    setSelectedFormat(format);
+    
+    toast.success('Image downloaded successfully!', {
+      description: `Saved as ${formatOption?.label} format`,
+      icon: <CheckCircle2 className="w-4 h-4" />,
+    });
+    
     setIsExporting(false);
+    
+    setTimeout(() => setLastExported(null), 3000);
   };
 
+  const selectedFormatOption = formatOptions.find(f => f.value === selectedFormat);
+
   return (
-    <Button
-      onClick={handleExport}
-      disabled={disabled || isExporting}
-      size="lg"
-      className="gap-2 px-6 shadow-md hover:shadow-lg transition-shadow"
-    >
-      {isExporting ? (
-        <>
-          <Loader2 className="w-4 h-4 animate-spin" />
-          Exporting...
-        </>
-      ) : (
-        <>
-          <Download className="w-4 h-4" />
-          Download PNG
-        </>
-      )}
-    </Button>
+    <div className="flex gap-2 w-full">
+      <Button
+        onClick={() => handleExport(selectedFormat)}
+        disabled={disabled || isExporting}
+        size="lg"
+        className="flex-1 gap-2 px-6 shadow-md hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary-foreground/10 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+        {isExporting ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="relative">Exporting...</span>
+          </>
+        ) : lastExported === selectedFormat ? (
+          <>
+            <CheckCircle2 className="w-4 h-4 animate-scale-in" />
+            <span className="relative">Downloaded!</span>
+          </>
+        ) : (
+          <>
+            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+            <span className="relative">Download {selectedFormatOption?.label}</span>
+          </>
+        )}
+      </Button>
+
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            disabled={disabled || isExporting}
+            size="lg"
+            variant="outline"
+            className={cn(
+              "gap-2 px-3 shadow-md hover:shadow-lg transition-all duration-300 border-2",
+              dropdownOpen && "border-primary bg-primary/5"
+            )}
+          >
+            <ChevronDown className={cn(
+              "w-4 h-4 transition-transform duration-300",
+              dropdownOpen && "rotate-180"
+            )} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="end" 
+          className="w-56 animate-scale-in"
+          sideOffset={8}
+        >
+          <DropdownMenuLabel className="flex items-center gap-2">
+            <FileImage className="w-4 h-4 text-primary" />
+            Export Format
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {formatOptions.map((format) => (
+            <DropdownMenuItem
+              key={format.value}
+              onClick={() => handleExport(format.value)}
+              className={cn(
+                "cursor-pointer transition-colors duration-200",
+                selectedFormat === format.value && "bg-primary/10"
+              )}
+            >
+              <div className="flex flex-col gap-0.5 py-1">
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-medium">{format.label}</span>
+                  {selectedFormat === format.value && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {format.description}
+                </span>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };
