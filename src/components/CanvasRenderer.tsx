@@ -8,7 +8,7 @@ interface CanvasRendererProps {
 }
 
 export interface CanvasRendererRef {
-  exportImage: () => string | null;
+  exportImage: (format?: 'png' | 'jpeg' | 'webp', quality?: number) => string | null;
 }
 
 const getAspectRatioDimensions = (
@@ -52,14 +52,24 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
     const [containerWidth, setContainerWidth] = useState(700);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
       if (image) {
+        setIsLoading(true);
         const img = new Image();
-        img.onload = () => setLoadedImage(img);
+        img.onload = () => {
+          setLoadedImage(img);
+          setTimeout(() => setIsLoading(false), 200);
+        };
+        img.onerror = () => {
+          setIsLoading(false);
+          setLoadedImage(null);
+        };
         img.src = image;
       } else {
         setLoadedImage(null);
+        setIsLoading(false);
       }
     }, [image]);
 
@@ -157,7 +167,7 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     }, [loadedImage, settings, canvasSize]);
 
     useImperativeHandle(ref, () => ({
-      exportImage: () => {
+      exportImage: (format: 'png' | 'jpeg' | 'webp' = 'png', quality: number = 0.95) => {
         const canvas = canvasRef.current;
         if (!canvas || !loadedImage) return null;
 
@@ -221,7 +231,9 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
         ctx.drawImage(loadedImage, x, y);
         ctx.restore();
 
-        return exportCanvas.toDataURL('image/png');
+        // Export with specified format
+        const mimeType = format === 'png' ? 'image/png' : format === 'jpeg' ? 'image/jpeg' : 'image/webp';
+        return exportCanvas.toDataURL(mimeType, quality);
       },
     }));
 
@@ -234,11 +246,13 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     return (
       <div ref={containerRef} className="flex items-center justify-center w-full min-h-[350px] p-6 bg-gradient-to-br from-muted/30 to-muted/10">
         <div
-          className="relative rounded-xl overflow-hidden transition-all duration-300"
+          className="relative rounded-xl overflow-hidden transition-all duration-500 ease-out"
           style={{ 
             width: displayWidth, 
             height: displayHeight,
-            boxShadow: image ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : 'none'
+            boxShadow: image ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : 'none',
+            opacity: isLoading ? 0.5 : 1,
+            transform: isLoading ? 'scale(0.98)' : 'scale(1)',
           }}
         >
           <canvas
@@ -251,8 +265,16 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
             }}
             className="block"
           />
-          {!image && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/90 backdrop-blur-sm border-2 border-dashed border-border/50 rounded-xl">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-card/50 backdrop-blur-sm rounded-xl">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                <p className="text-sm text-muted-foreground font-medium">Processing...</p>
+              </div>
+            </div>
+          )}
+          {!image && !isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/90 backdrop-blur-sm border-2 border-dashed border-border/50 rounded-xl animate-fade-in">
               <div className="p-4 rounded-full bg-muted/50">
                 <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
               </div>
