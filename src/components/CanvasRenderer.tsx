@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { StyleSettings } from '@/types/beautifier';
+import { ImageIcon } from 'lucide-react';
 
 interface CanvasRendererProps {
   image: string | null;
@@ -49,7 +50,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
-    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
+    const [containerWidth, setContainerWidth] = useState(700);
 
     useEffect(() => {
       if (image) {
@@ -60,6 +62,17 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
         setLoadedImage(null);
       }
     }, [image]);
+
+    useEffect(() => {
+      const updateWidth = () => {
+        if (containerRef.current) {
+          setContainerWidth(containerRef.current.clientWidth);
+        }
+      };
+      updateWidth();
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
+    }, []);
 
     useEffect(() => {
       if (!loadedImage) return;
@@ -103,16 +116,16 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
       // Draw blurred background if enabled
       if (settings.blurBackground) {
         ctx.save();
-        ctx.filter = 'blur(30px)';
-        ctx.globalAlpha = 0.6;
-        ctx.drawImage(loadedImage, -50, -50, canvas.width + 100, canvas.height + 100);
+        ctx.filter = 'blur(40px) saturate(1.2)';
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(loadedImage, -80, -80, canvas.width + 160, canvas.height + 160);
         ctx.restore();
 
         // Redraw the gradient with transparency
         if (settings.useGradient) {
           const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-          gradient.addColorStop(0, settings.gradientStart + '80');
-          gradient.addColorStop(1, settings.gradientEnd + '80');
+          gradient.addColorStop(0, settings.gradientStart + '90');
+          gradient.addColorStop(1, settings.gradientEnd + '90');
           ctx.fillStyle = gradient;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -122,9 +135,9 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
       if (settings.shadowIntensity > 0) {
         ctx.save();
         ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
-        ctx.shadowBlur = settings.shadowIntensity;
+        ctx.shadowBlur = settings.shadowIntensity * 1.5;
         ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = settings.shadowIntensity / 3;
+        ctx.shadowOffsetY = settings.shadowIntensity / 2;
 
         // Draw shadow shape
         ctx.beginPath();
@@ -174,15 +187,15 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
 
         if (settings.blurBackground) {
           ctx.save();
-          ctx.filter = 'blur(30px)';
-          ctx.globalAlpha = 0.6;
-          ctx.drawImage(loadedImage, -50, -50, canvas.width + 100, canvas.height + 100);
+          ctx.filter = 'blur(40px) saturate(1.2)';
+          ctx.globalAlpha = 0.7;
+          ctx.drawImage(loadedImage, -80, -80, canvas.width + 160, canvas.height + 160);
           ctx.restore();
 
           if (settings.useGradient) {
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, settings.gradientStart + '80');
-            gradient.addColorStop(1, settings.gradientEnd + '80');
+            gradient.addColorStop(0, settings.gradientStart + '90');
+            gradient.addColorStop(1, settings.gradientEnd + '90');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
@@ -191,9 +204,9 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
         if (settings.shadowIntensity > 0) {
           ctx.save();
           ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
-          ctx.shadowBlur = settings.shadowIntensity;
+          ctx.shadowBlur = settings.shadowIntensity * 1.5;
           ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = settings.shadowIntensity / 3;
+          ctx.shadowOffsetY = settings.shadowIntensity / 2;
           ctx.beginPath();
           roundRect(ctx, x, y, loadedImage.width, loadedImage.height, settings.borderRadius);
           ctx.fillStyle = 'white';
@@ -213,16 +226,20 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     }));
 
     // Calculate display size to fit container
-    const containerWidth = containerRef.current?.clientWidth || 700;
-    const scale = Math.min(1, (containerWidth - 32) / canvasSize.width);
+    const maxWidth = containerWidth - 48;
+    const scale = Math.min(1, maxWidth / canvasSize.width);
     const displayWidth = canvasSize.width * scale;
     const displayHeight = canvasSize.height * scale;
 
     return (
-      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[400px] p-4">
+      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[350px] p-6 bg-gradient-to-br from-muted/30 to-muted/10">
         <div
-          className="relative rounded-lg overflow-hidden shadow-xl"
-          style={{ width: displayWidth, height: displayHeight }}
+          className="relative rounded-xl overflow-hidden transition-all duration-300"
+          style={{ 
+            width: displayWidth, 
+            height: displayHeight,
+            boxShadow: image ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : 'none'
+          }}
         >
           <canvas
             ref={canvasRef}
@@ -235,10 +252,16 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
             className="block"
           />
           {!image && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/50 backdrop-blur-sm">
-              <p className="text-muted-foreground text-center px-4">
-                Upload a screenshot to see the preview
-              </p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/90 backdrop-blur-sm border-2 border-dashed border-border/50 rounded-xl">
+              <div className="p-4 rounded-full bg-muted/50">
+                <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
+              </div>
+              <div className="text-center px-6">
+                <p className="text-muted-foreground font-medium">Preview Area</p>
+                <p className="text-sm text-muted-foreground/70 mt-1">
+                  Upload a screenshot to see the magic
+                </p>
+              </div>
             </div>
           )}
         </div>

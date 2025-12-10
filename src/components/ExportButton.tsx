@@ -1,6 +1,7 @@
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface ExportButtonProps {
   onExport: () => string | null;
@@ -8,29 +9,53 @@ interface ExportButtonProps {
 }
 
 export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
-  const handleExport = () => {
-    const dataUrl = onExport();
-    if (!dataUrl) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (disabled) {
       toast.error('Please upload an image first');
       return;
     }
 
+    setIsExporting(true);
+    
+    // Small delay for UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const dataUrl = onExport();
+    if (!dataUrl) {
+      toast.error('Failed to export image');
+      setIsExporting(false);
+      return;
+    }
+
     const link = document.createElement('a');
-    link.download = `beautified-screenshot-${Date.now()}.png`;
+    link.download = `beautified-${Date.now()}.png`;
     link.href = dataUrl;
     link.click();
-    toast.success('Image downloaded successfully!');
+    
+    toast.success('Image downloaded!');
+    setIsExporting(false);
   };
 
   return (
     <Button
       onClick={handleExport}
-      disabled={disabled}
+      disabled={disabled || isExporting}
       size="lg"
-      className="w-full gap-2"
+      className="gap-2 px-6 shadow-md hover:shadow-lg transition-shadow"
     >
-      <Download className="w-5 h-5" />
-      Download PNG
+      {isExporting ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Exporting...
+        </>
+      ) : (
+        <>
+          <Download className="w-4 h-4" />
+          Download PNG
+        </>
+      )}
     </Button>
   );
 };

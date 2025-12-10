@@ -22,13 +22,17 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
 
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold text-foreground text-sm uppercase tracking-wide">Settings</h3>
+      <h3 className="font-semibold text-foreground/80 text-xs uppercase tracking-wider">
+        Settings
+      </h3>
 
       {/* Padding */}
-      <div className="space-y-3">
+      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Padding</Label>
-          <span className="text-xs text-muted-foreground">{settings.padding}px</span>
+          <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+            {settings.padding}px
+          </span>
         </div>
         <Slider
           value={[settings.padding]}
@@ -41,10 +45,12 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Border Radius */}
-      <div className="space-y-3">
+      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '50ms' }}>
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Border Radius</Label>
-          <span className="text-xs text-muted-foreground">{settings.borderRadius}px</span>
+          <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+            {settings.borderRadius}px
+          </span>
         </div>
         <Slider
           value={[settings.borderRadius]}
@@ -57,10 +63,12 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Shadow Intensity */}
-      <div className="space-y-3">
+      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium">Shadow Intensity</Label>
-          <span className="text-xs text-muted-foreground">{settings.shadowIntensity}%</span>
+          <Label className="text-sm font-medium">Shadow</Label>
+          <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
+            {settings.shadowIntensity}%
+          </span>
         </div>
         <Slider
           value={[settings.shadowIntensity]}
@@ -73,7 +81,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Aspect Ratio */}
-      <div className="space-y-3">
+      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '150ms' }}>
         <Label className="text-sm font-medium">Aspect Ratio</Label>
         <Select
           value={settings.aspectRatio}
@@ -84,17 +92,19 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="auto">Auto</SelectItem>
-            <SelectItem value="1:1">1:1 (Square)</SelectItem>
-            <SelectItem value="16:9">16:9 (Landscape)</SelectItem>
-            <SelectItem value="4:5">4:5 (Portrait)</SelectItem>
-            <SelectItem value="9:16">9:16 (Story)</SelectItem>
+            <SelectItem value="1:1">1:1 Square</SelectItem>
+            <SelectItem value="16:9">16:9 Landscape</SelectItem>
+            <SelectItem value="4:5">4:5 Portrait</SelectItem>
+            <SelectItem value="9:16">9:16 Story</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
+      <div className="h-px bg-border my-2" />
+
       {/* Use Gradient */}
-      <div className="flex items-center justify-between py-2">
-        <Label className="text-sm font-medium">Use Gradient</Label>
+      <div className="flex items-center justify-between py-1 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        <Label className="text-sm font-medium">Gradient Background</Label>
         <Switch
           checked={settings.useGradient}
           onCheckedChange={(checked) => updateSetting('useGradient', checked)}
@@ -103,67 +113,71 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
 
       {/* Background Color / Gradient */}
       {settings.useGradient ? (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in">
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Gradient Start</Label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={settings.gradientStart}
-                onChange={(e) => updateSetting('gradientStart', e.target.value)}
-                className="w-10 h-10 rounded-lg border border-border cursor-pointer"
-              />
+            <Label className="text-xs text-muted-foreground">Start Color</Label>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <input
+                  type="color"
+                  value={settings.gradientStart}
+                  onChange={(e) => updateSetting('gradientStart', e.target.value)}
+                  className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
+                />
+              </div>
               <input
                 type="text"
                 value={settings.gradientStart}
                 onChange={(e) => updateSetting('gradientStart', e.target.value)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-input bg-background"
+                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Gradient End</Label>
-            <div className="flex items-center gap-3">
+            <Label className="text-xs text-muted-foreground">End Color</Label>
+            <div className="flex items-center gap-2">
               <input
                 type="color"
                 value={settings.gradientEnd}
                 onChange={(e) => updateSetting('gradientEnd', e.target.value)}
-                className="w-10 h-10 rounded-lg border border-border cursor-pointer"
+                className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
               />
               <input
                 type="text"
                 value={settings.gradientEnd}
                 onChange={(e) => updateSetting('gradientEnd', e.target.value)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-input bg-background"
+                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
               />
             </div>
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Background Color</Label>
-          <div className="flex items-center gap-3">
+        <div className="space-y-2 animate-fade-in">
+          <Label className="text-xs text-muted-foreground">Background Color</Label>
+          <div className="flex items-center gap-2">
             <input
               type="color"
               value={settings.backgroundColor}
               onChange={(e) => updateSetting('backgroundColor', e.target.value)}
-              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
+              className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
             />
             <input
               type="text"
               value={settings.backgroundColor}
               onChange={(e) => updateSetting('backgroundColor', e.target.value)}
-              className="flex-1 px-3 py-2 text-sm rounded-lg border border-input bg-background"
+              className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
             />
           </div>
         </div>
       )}
 
+      <div className="h-px bg-border my-2" />
+
       {/* Blur Background */}
-      <div className="flex items-center justify-between py-2">
-        <div>
-          <Label className="text-sm font-medium">Blur Background</Label>
-          <p className="text-xs text-muted-foreground mt-0.5">Use screenshot as blurred backdrop</p>
+      <div className="flex items-center justify-between py-1 animate-fade-in" style={{ animationDelay: '250ms' }}>
+        <div className="space-y-0.5">
+          <Label className="text-sm font-medium">Blur Effect</Label>
+          <p className="text-[11px] text-muted-foreground">Screenshot as blurred backdrop</p>
         </div>
         <Switch
           checked={settings.blurBackground}

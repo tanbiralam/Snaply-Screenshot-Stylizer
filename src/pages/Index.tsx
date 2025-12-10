@@ -5,7 +5,7 @@ import { CanvasRenderer, CanvasRendererRef } from '@/components/CanvasRenderer';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { ExportButton } from '@/components/ExportButton';
 import { StyleSettings, defaultSettings, Preset } from '@/types/beautifier';
-import { Sparkles, ChevronDown } from 'lucide-react';
+import { Sparkles, ChevronDown, Palette, Sliders } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,8 +17,8 @@ const Index = () => {
   const [image, setImage] = useState<string | null>(null);
   const [settings, setSettings] = useState<StyleSettings>(defaultSettings);
   const [activePreset, setActivePreset] = useState<string | null>(null);
-  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
-  const [rightPanelOpen, setRightPanelOpen] = useState(true);
+  const [leftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const canvasRef = useRef<CanvasRendererRef>(null);
 
   const handlePresetSelect = (preset: Preset) => {
@@ -38,16 +38,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Sparkles className="w-6 h-6 text-primary" />
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+              <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Screenshot Beautifier</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block">
-                Transform your screenshots into stunning visuals
+              <h1 className="text-lg font-bold text-foreground tracking-tight">Screenshot Beautifier</h1>
+              <p className="text-xs text-muted-foreground hidden sm:block">
+                Transform screenshots into stunning visuals
               </p>
             </div>
           </div>
@@ -58,24 +58,27 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-6">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-6">
           {/* Left Panel - Style Presets */}
-          <aside className="lg:block">
+          <aside className="lg:block order-2 lg:order-1">
             {/* Mobile collapsible */}
             <div className="lg:hidden">
               <Collapsible open={leftPanelOpen} onOpenChange={setLeftPanelOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 rounded-lg bg-card border border-border">
-                  <span className="font-semibold">Style Presets</span>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 rounded-xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">Style Presets</span>
+                  </div>
                   <ChevronDown
                     className={cn(
-                      'w-5 h-5 transition-transform',
+                      'w-4 h-4 text-muted-foreground transition-transform duration-200',
                       leftPanelOpen && 'rotate-180'
                     )}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  <div className="p-4 rounded-lg bg-card border border-border">
+                <CollapsibleContent className="mt-3 animate-slide-up">
+                  <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
                     <StylePresets
                       activePreset={activePreset}
                       onSelectPreset={handlePresetSelect}
@@ -86,8 +89,8 @@ const Index = () => {
             </div>
 
             {/* Desktop fixed panel */}
-            <div className="hidden lg:block sticky top-24">
-              <div className="p-4 rounded-lg bg-card border border-border max-h-[calc(100vh-120px)] overflow-y-auto">
+            <div className="hidden lg:block sticky top-20">
+              <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm max-h-[calc(100vh-110px)] overflow-y-auto">
                 <StylePresets
                   activePreset={activePreset}
                   onSelectPreset={handlePresetSelect}
@@ -97,35 +100,38 @@ const Index = () => {
           </aside>
 
           {/* Center - Canvas */}
-          <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-card border border-border">
+          <div className="space-y-4 order-1 lg:order-2">
+            <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm animate-fade-in">
               <ImageUpload onImageUpload={setImage} hasImage={!!image} />
             </div>
-            <div className="rounded-lg bg-card border border-border overflow-hidden">
+            <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 overflow-hidden shadow-lg animate-scale-in">
               <CanvasRenderer ref={canvasRef} image={image} settings={settings} />
             </div>
             {/* Mobile export button */}
-            <div className="md:hidden">
+            <div className="md:hidden animate-fade-in">
               <ExportButton onExport={handleExport} disabled={!image} />
             </div>
           </div>
 
           {/* Right Panel - Settings */}
-          <aside className="lg:block">
+          <aside className="lg:block order-3">
             {/* Mobile collapsible */}
             <div className="lg:hidden">
               <Collapsible open={rightPanelOpen} onOpenChange={setRightPanelOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 rounded-lg bg-card border border-border">
-                  <span className="font-semibold">Settings</span>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 rounded-xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm">Settings</span>
+                  </div>
                   <ChevronDown
                     className={cn(
-                      'w-5 h-5 transition-transform',
+                      'w-4 h-4 text-muted-foreground transition-transform duration-200',
                       rightPanelOpen && 'rotate-180'
                     )}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  <div className="p-4 rounded-lg bg-card border border-border">
+                <CollapsibleContent className="mt-3 animate-slide-up">
+                  <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
                     <SettingsPanel
                       settings={settings}
                       onSettingsChange={handleSettingsChange}
@@ -136,8 +142,8 @@ const Index = () => {
             </div>
 
             {/* Desktop fixed panel */}
-            <div className="hidden lg:block sticky top-24">
-              <div className="p-4 rounded-lg bg-card border border-border max-h-[calc(100vh-120px)] overflow-y-auto">
+            <div className="hidden lg:block sticky top-20">
+              <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm max-h-[calc(100vh-110px)] overflow-y-auto">
                 <SettingsPanel
                   settings={settings}
                   onSettingsChange={handleSettingsChange}
@@ -147,6 +153,13 @@ const Index = () => {
           </aside>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border/30 mt-12 py-6">
+        <p className="text-center text-xs text-muted-foreground">
+          Free to use • No login required • Local processing only
+        </p>
+      </footer>
     </div>
   );
 };
