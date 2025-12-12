@@ -5,13 +5,14 @@ import { CanvasRenderer, CanvasRendererRef } from '@/components/CanvasRenderer';
 import { SettingsPanel } from '@/components/SettingsPanel';
 import { ExportButton } from '@/components/ExportButton';
 import { StyleSettings, defaultSettings, Preset } from '@/types/beautifier';
-import { Sparkles, ChevronDown, Palette, Sliders } from 'lucide-react';
+import { Aperture, ChevronDown, Palette, Sliders } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -36,13 +37,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-20 animate-slide-down">
+      <header className="border-b border-border/50 bg-card/90 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 shadow-sm hover:shadow-md transition-shadow">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/15 to-primary/0 border border-primary/20 shadow-sm">
+              <Aperture className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-foreground tracking-tight">Screenshot Beautifier</h1>
@@ -51,7 +52,8 @@ const Index = () => {
               </p>
             </div>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <ExportButton onExport={handleExport} disabled={!image} />
           </div>
         </div>
@@ -77,7 +79,7 @@ const Index = () => {
                     )}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-3 animate-slide-up">
+                <CollapsibleContent className="mt-3">
                   <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
                     <StylePresets
                       activePreset={activePreset}
@@ -101,14 +103,15 @@ const Index = () => {
 
           {/* Center - Canvas */}
           <div className="space-y-4 order-1 lg:order-2">
-            <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm animate-fade-in">
+            <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
               <ImageUpload onImageUpload={setImage} hasImage={!!image} />
             </div>
-            <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 overflow-hidden shadow-lg animate-scale-in">
+            <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 overflow-hidden shadow-lg">
               <CanvasRenderer ref={canvasRef} image={image} settings={settings} />
             </div>
             {/* Mobile export button */}
-            <div className="md:hidden animate-fade-in">
+            <div className="md:hidden flex items-center justify-between gap-3">
+              <ThemeToggle />
               <ExportButton onExport={handleExport} disabled={!image} />
             </div>
           </div>
@@ -130,7 +133,7 @@ const Index = () => {
                     )}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-3 animate-slide-up">
+                <CollapsibleContent className="mt-3">
                   <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
                     <SettingsPanel
                       settings={settings}
@@ -155,7 +158,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 mt-12 py-6 animate-fade-in">
+      <footer className="border-t border-border/30 mt-12 py-6">
         <p className="text-center text-xs text-muted-foreground">
           Free to use • No login required • Local processing only
         </p>

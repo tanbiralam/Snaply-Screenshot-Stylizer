@@ -244,15 +244,14 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     const displayHeight = canvasSize.height * scale;
 
     return (
-      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[350px] p-6 bg-gradient-to-br from-muted/30 to-muted/10">
+      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[350px] p-6 bg-gradient-to-br from-muted/20 to-muted/5">
         <div
-          className="relative rounded-xl overflow-hidden transition-all duration-500 ease-out"
+          className="relative rounded-xl overflow-hidden shadow-lg"
           style={{ 
             width: displayWidth, 
             height: displayHeight,
-            boxShadow: image ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : 'none',
-            opacity: isLoading ? 0.5 : 1,
-            transform: isLoading ? 'scale(0.98)' : 'scale(1)',
+            boxShadow: image ? '0 20px 35px -18px rgba(0, 0, 0, 0.2)' : 'none',
+            opacity: isLoading ? 0.8 : 1,
           }}
         >
           <canvas
@@ -274,7 +273,7 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
             </div>
           )}
           {!image && !isLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/90 backdrop-blur-sm border-2 border-dashed border-border/50 rounded-xl animate-fade-in">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-card/90 backdrop-blur-sm border-2 border-dashed border-border/50 rounded-xl">
               <div className="p-4 rounded-full bg-muted/50">
                 <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
               </div>

@@ -27,7 +27,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </h3>
 
       {/* Padding */}
-      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Padding</Label>
           <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
@@ -45,7 +45,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Border Radius */}
-      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '50ms' }}>
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Border Radius</Label>
           <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
@@ -63,7 +63,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Shadow Intensity */}
-      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium">Shadow</Label>
           <span className="text-xs font-mono text-muted-foreground bg-muted/50 px-2 py-0.5 rounded">
@@ -81,7 +81,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       </div>
 
       {/* Aspect Ratio */}
-      <div className="space-y-3 animate-fade-in" style={{ animationDelay: '150ms' }}>
+      <div className="space-y-3">
         <Label className="text-sm font-medium">Aspect Ratio</Label>
         <Select
           value={settings.aspectRatio}
@@ -103,7 +103,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       <div className="h-px bg-border my-2" />
 
       {/* Use Gradient */}
-      <div className="flex items-center justify-between py-1 animate-fade-in" style={{ animationDelay: '200ms' }}>
+      <div className="flex items-center justify-between py-1">
         <Label className="text-sm font-medium">Gradient Background</Label>
         <Switch
           checked={settings.useGradient}
@@ -113,7 +113,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
 
       {/* Background Color / Gradient */}
       {settings.useGradient ? (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Start Color</Label>
             <div className="flex items-center gap-2">
@@ -152,7 +152,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
           </div>
         </div>
       ) : (
-        <div className="space-y-2 animate-fade-in">
+        <div className="space-y-2">
           <Label className="text-xs text-muted-foreground">Background Color</Label>
           <div className="flex items-center gap-2">
             <input
@@ -174,7 +174,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       <div className="h-px bg-border my-2" />
 
       {/* Blur Background */}
-      <div className="flex items-center justify-between py-1 animate-fade-in" style={{ animationDelay: '250ms' }}>
+      <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Blur Effect</Label>
           <p className="text-[11px] text-muted-foreground">Screenshot as blurred backdrop</p>

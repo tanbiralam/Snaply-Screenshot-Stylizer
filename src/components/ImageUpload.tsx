@@ -56,12 +56,12 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={cn(
-        'relative flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed transition-all duration-300 cursor-pointer group',
+        'relative flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed transition-colors duration-200 cursor-pointer group',
         isDragging
-          ? 'border-primary bg-primary/10 scale-[1.02] shadow-lg shadow-primary/20'
+          ? 'border-primary bg-primary/10 shadow-md shadow-primary/15'
           : hasImage
-          ? 'border-primary/40 bg-primary/5 hover:border-primary/60 hover:shadow-md'
-          : 'border-border/60 hover:border-primary/50 hover:bg-accent/30 hover:shadow-sm'
+          ? 'border-primary/40 bg-primary/5 hover:border-primary/60 hover:shadow-sm'
+          : 'border-border/60 hover:border-primary/50 hover:bg-accent/20 hover:shadow-sm'
       )}
     >
       <input
@@ -72,20 +72,20 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       />
       <div
         className={cn(
-          'p-3 rounded-full transition-all duration-300 relative',
+          'p-3 rounded-full transition-colors duration-200 relative',
           isDragging
-            ? 'bg-primary/20 scale-110 animate-pulse-soft'
+            ? 'bg-primary/15'
             : hasImage
             ? 'bg-primary/10'
-            : 'bg-muted/50 group-hover:bg-primary/10 group-hover:scale-105'
+            : 'bg-muted/50 group-hover:bg-primary/10'
         )}
       >
         {hasImage ? (
-          <CheckCircle className="w-6 h-6 text-primary animate-scale-in" />
+          <CheckCircle className="w-6 h-6 text-primary" />
         ) : isDragging ? (
-          <ImageIcon className="w-6 h-6 text-primary animate-bounce-subtle" />
+          <ImageIcon className="w-6 h-6 text-primary" />
         ) : (
-          <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors group-hover:-translate-y-0.5 transition-transform duration-300" />
+          <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
         )}
       </div>
       <div className="text-center">

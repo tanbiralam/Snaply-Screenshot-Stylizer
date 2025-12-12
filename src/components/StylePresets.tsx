@@ -14,7 +14,7 @@ export const StylePresets = ({ activePreset, onSelectPreset }: StylePresetsProps
         Style Presets
       </h3>
       <div className="space-y-2">
-        {presets.map((preset, index) => {
+        {presets.map((preset) => {
           const isActive = activePreset === preset.id;
           const gradientStyle = preset.settings.useGradient
             ? `linear-gradient(135deg, ${preset.settings.gradientStart}, ${preset.settings.gradientEnd})`
@@ -24,9 +24,8 @@ export const StylePresets = ({ activePreset, onSelectPreset }: StylePresetsProps
             <button
               key={preset.id}
               onClick={() => onSelectPreset(preset)}
-              style={{ animationDelay: `${index * 50}ms` }}
               className={cn(
-                'relative w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200 text-left group animate-fade-in',
+                'relative w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-colors duration-200 text-left group',
                 isActive
                   ? 'border-primary bg-primary/5 shadow-md'
                   : 'border-transparent bg-background hover:bg-accent/50 hover:shadow-sm'

@@ -63,9 +63,9 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
 
     setIsExporting(true);
     setDropdownOpen(false);
-    
+
     await new Promise(resolve => setTimeout(resolve, 400));
-    
+
     const dataUrl = onExport(format);
     if (!dataUrl) {
       toast.error('Failed to export image', {
@@ -80,17 +80,17 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
     link.download = `beautified-${Date.now()}.${formatOption?.extension || 'png'}`;
     link.href = dataUrl;
     link.click();
-    
+
     setLastExported(format);
     setSelectedFormat(format);
-    
+
     toast.success('Image downloaded successfully!', {
       description: `Saved as ${formatOption?.label} format`,
       icon: <CheckCircle2 className="w-4 h-4" />,
     });
-    
+
     setIsExporting(false);
-    
+
     setTimeout(() => setLastExported(null), 3000);
   };
 
@@ -102,9 +102,8 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
         onClick={() => handleExport(selectedFormat)}
         disabled={disabled || isExporting}
         size="lg"
-        className="flex-1 gap-2 px-6 shadow-md hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
+        className="flex-1 gap-2 px-6 shadow-sm hover:shadow-md transition-colors duration-200"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary-foreground/10 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
         {isExporting ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -112,12 +111,12 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
           </>
         ) : lastExported === selectedFormat ? (
           <>
-            <CheckCircle2 className="w-4 h-4 animate-scale-in" />
+            <CheckCircle2 className="w-4 h-4" />
             <span className="relative">Downloaded!</span>
           </>
         ) : (
           <>
-            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+            <Download className="w-4 h-4" />
             <span className="relative">Download {selectedFormatOption?.label}</span>
           </>
         )}
@@ -130,19 +129,19 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
             size="lg"
             variant="outline"
             className={cn(
-              "gap-2 px-3 shadow-md hover:shadow-lg transition-all duration-300 border-2",
+              "gap-2 px-3 shadow-sm hover:shadow-md transition-colors duration-200 border-2",
               dropdownOpen && "border-primary bg-primary/5"
             )}
           >
             <ChevronDown className={cn(
-              "w-4 h-4 transition-transform duration-300",
+              "w-4 h-4 transition-transform duration-200",
               dropdownOpen && "rotate-180"
             )} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-56 animate-scale-in"
+          className="w-56"
           sideOffset={8}
         >
           <DropdownMenuLabel className="flex items-center gap-2">
