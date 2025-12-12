@@ -56,12 +56,12 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={cn(
-        'relative flex flex-col items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed transition-colors duration-200 cursor-pointer group',
+        'relative flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-dashed transition-colors duration-150 cursor-pointer group bg-card/70',
         isDragging
           ? 'border-primary bg-primary/10 shadow-md shadow-primary/15'
           : hasImage
-          ? 'border-primary/40 bg-primary/5 hover:border-primary/60 hover:shadow-sm'
-          : 'border-border/60 hover:border-primary/50 hover:bg-accent/20 hover:shadow-sm'
+          ? 'border-primary/50 bg-primary/5 hover:border-primary/60'
+          : 'border-border/50 hover:border-primary/50 hover:bg-accent/20'
       )}
     >
       <input
@@ -72,12 +72,12 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       />
       <div
         className={cn(
-          'p-3 rounded-full transition-colors duration-200 relative',
+          'p-3 rounded-full transition-colors duration-150 relative bg-accent/40',
           isDragging
             ? 'bg-primary/15'
             : hasImage
             ? 'bg-primary/10'
-            : 'bg-muted/50 group-hover:bg-primary/10'
+            : 'group-hover:bg-primary/10'
         )}
       >
         {hasImage ? (

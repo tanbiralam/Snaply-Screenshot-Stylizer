@@ -102,7 +102,7 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
         onClick={() => handleExport(selectedFormat)}
         disabled={disabled || isExporting}
         size="lg"
-        className="flex-1 gap-2 px-6 shadow-sm hover:shadow-md transition-colors duration-200"
+        className="flex-1 gap-2 px-6 shadow-sm hover:shadow-md transition-colors duration-150 bg-primary text-primary-foreground hover:bg-primary/90"
       >
         {isExporting ? (
           <>
@@ -129,7 +129,7 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
             size="lg"
             variant="outline"
             className={cn(
-              "gap-2 px-3 shadow-sm hover:shadow-md transition-colors duration-200 border-2",
+              "gap-2 px-3 shadow-sm hover:shadow-md transition-colors duration-150 border-2",
               dropdownOpen && "border-primary bg-primary/5"
             )}
           >

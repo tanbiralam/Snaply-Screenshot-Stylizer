@@ -244,14 +244,14 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     const displayHeight = canvasSize.height * scale;
 
     return (
-      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[350px] p-6 bg-gradient-to-br from-muted/20 to-muted/5">
+      <div ref={containerRef} className="flex items-center justify-center w-full min-h-[360px] p-5 bg-gradient-to-br from-background to-accent/10 rounded-xl border border-border/60">
         <div
-          className="relative rounded-xl overflow-hidden shadow-lg"
+          className="relative rounded-lg overflow-hidden bg-card/80"
           style={{ 
             width: displayWidth, 
             height: displayHeight,
-            boxShadow: image ? '0 20px 35px -18px rgba(0, 0, 0, 0.2)' : 'none',
-            opacity: isLoading ? 0.8 : 1,
+            boxShadow: image ? '0 12px 40px -22px rgba(0, 0, 0, 0.45)' : '0 0 0 1px hsl(var(--border) / 0.7)',
+            opacity: isLoading ? 0.85 : 1,
           }}
         >
           <canvas

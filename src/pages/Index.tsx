@@ -39,10 +39,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/90 backdrop-blur-md sticky top-0 z-20">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <header className="border-b border-border/60 bg-background/90 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/15 to-primary/0 border border-primary/20 shadow-sm">
+            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
               <Aperture className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -60,8 +60,8 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] gap-5">
           {/* Left Panel - Style Presets */}
           <aside className="lg:block order-2 lg:order-1">
             {/* Mobile collapsible */}
@@ -92,7 +92,7 @@ const Index = () => {
 
             {/* Desktop fixed panel */}
             <div className="hidden lg:block sticky top-20">
-              <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm max-h-[calc(100vh-110px)] overflow-y-auto">
+              <div className="p-4 rounded-xl bg-card/90 border border-border/60 max-h-[calc(100vh-120px)] overflow-y-auto">
                 <StylePresets
                   activePreset={activePreset}
                   onSelectPreset={handlePresetSelect}
@@ -103,10 +103,10 @@ const Index = () => {
 
           {/* Center - Canvas */}
           <div className="space-y-4 order-1 lg:order-2">
-            <div className="p-4 rounded-xl bg-card border border-border/50 shadow-sm">
+            <div className="p-4 rounded-xl bg-card/90 border border-border/60">
               <ImageUpload onImageUpload={setImage} hasImage={!!image} />
             </div>
-            <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 overflow-hidden shadow-lg">
+            <div className="rounded-xl bg-card/80 border border-border/60 overflow-hidden">
               <CanvasRenderer ref={canvasRef} image={image} settings={settings} />
             </div>
             {/* Mobile export button */}
@@ -146,7 +146,7 @@ const Index = () => {
 
             {/* Desktop fixed panel */}
             <div className="hidden lg:block sticky top-20">
-              <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm max-h-[calc(100vh-110px)] overflow-y-auto">
+              <div className="p-4 rounded-xl bg-card/90 border border-border/60 max-h-[calc(100vh-120px)] overflow-y-auto">
                 <SettingsPanel
                   settings={settings}
                   onSettingsChange={handleSettingsChange}
@@ -158,7 +158,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/30 mt-12 py-6">
+      <footer className="border-t border-border/50 mt-10 py-5">
         <p className="text-center text-xs text-muted-foreground">
           Free to use • No login required • Local processing only
         </p>
