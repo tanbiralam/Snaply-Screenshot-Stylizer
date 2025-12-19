@@ -1,18 +1,18 @@
-import { useState, useRef } from 'react';
-import { ImageUpload } from '@/components/ImageUpload';
-import { StylePresets } from '@/components/StylePresets';
-import { CanvasRenderer, CanvasRendererRef } from '@/components/CanvasRenderer';
-import { SettingsPanel } from '@/components/SettingsPanel';
-import { ExportButton } from '@/components/ExportButton';
-import { StyleSettings, defaultSettings, Preset } from '@/types/beautifier';
-import { Aperture, ChevronDown, Palette, Sliders } from 'lucide-react';
+import { useState, useRef } from "react";
+import { ImageUpload } from "@/components/ImageUpload";
+import { StylePresets } from "@/components/StylePresets";
+import { CanvasRenderer, CanvasRendererRef } from "@/components/CanvasRenderer";
+import { SettingsPanel } from "@/components/SettingsPanel";
+import { ExportButton } from "@/components/ExportButton";
+import { StyleSettings, defaultSettings, Preset } from "@/types/beautifier";
+import { Aperture, ChevronDown, Palette, Sliders } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
-import { ThemeToggle } from '@/components/ThemeToggle';
+} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -32,7 +32,7 @@ const Index = () => {
     setActivePreset(null);
   };
 
-  const handleExport = (format: 'png' | 'jpeg' | 'webp') => {
+  const handleExport = (format: "png" | "jpeg" | "webp") => {
     return canvasRef.current?.exportImage(format) ?? null;
   };
 
@@ -43,10 +43,12 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <Aperture className="w-5 h-5 text-primary" />
+              <img className="w-5 h-5 text-primary" src="/logo.png" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground tracking-tight">Screenshot Beautifier</h1>
+              <h1 className="text-lg font-bold text-foreground tracking-tight">
+                Snaply
+              </h1>
               <p className="text-xs text-muted-foreground hidden sm:block">
                 Transform screenshots into stunning visuals
               </p>
@@ -60,8 +62,8 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] gap-5">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,800px)_1fr] gap-5">
           {/* Left Panel - Style Presets */}
           <aside className="lg:block order-2 lg:order-1">
             {/* Mobile collapsible */}
@@ -74,8 +76,8 @@ const Index = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      'w-4 h-4 text-muted-foreground transition-transform duration-200',
-                      leftPanelOpen && 'rotate-180'
+                      "w-4 h-4 text-muted-foreground transition-transform duration-200",
+                      leftPanelOpen && "rotate-180"
                     )}
                   />
                 </CollapsibleTrigger>
@@ -100,14 +102,17 @@ const Index = () => {
               </div>
             </div>
           </aside>
-
           {/* Center - Canvas */}
           <div className="space-y-4 order-1 lg:order-2">
             <div className="p-4 rounded-xl bg-card/90 border border-border/60">
               <ImageUpload onImageUpload={setImage} hasImage={!!image} />
             </div>
             <div className="rounded-xl bg-card/80 border border-border/60 overflow-hidden">
-              <CanvasRenderer ref={canvasRef} image={image} settings={settings} />
+              <CanvasRenderer
+                ref={canvasRef}
+                image={image}
+                settings={settings}
+              />
             </div>
             {/* Mobile export button */}
             <div className="md:hidden flex items-center justify-between gap-3">
@@ -115,12 +120,14 @@ const Index = () => {
               <ExportButton onExport={handleExport} disabled={!image} />
             </div>
           </div>
-
           {/* Right Panel - Settings */}
           <aside className="lg:block order-3">
             {/* Mobile collapsible */}
             <div className="lg:hidden">
-              <Collapsible open={rightPanelOpen} onOpenChange={setRightPanelOpen}>
+              <Collapsible
+                open={rightPanelOpen}
+                onOpenChange={setRightPanelOpen}
+              >
                 <CollapsibleTrigger className="flex items-center justify-between w-full p-4 rounded-xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-2">
                     <Sliders className="w-4 h-4 text-primary" />
@@ -128,8 +135,8 @@ const Index = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      'w-4 h-4 text-muted-foreground transition-transform duration-200',
-                      rightPanelOpen && 'rotate-180'
+                      "w-4 h-4 text-muted-foreground transition-transform duration-200",
+                      rightPanelOpen && "rotate-180"
                     )}
                   />
                 </CollapsibleTrigger>
@@ -146,7 +153,7 @@ const Index = () => {
 
             {/* Desktop fixed panel */}
             <div className="hidden lg:block sticky top-20">
-              <div className="p-4 rounded-xl bg-card/90 border border-border/60 max-h-[calc(100vh-120px)] overflow-y-auto">
+              <div className="p-4 rounded-xl bg-card/90 border border-border/60 max-h-[calc(100vh-120px)] overflow-hidden">
                 <SettingsPanel
                   settings={settings}
                   onSettingsChange={handleSettingsChange}

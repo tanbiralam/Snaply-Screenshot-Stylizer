@@ -1,22 +1,28 @@
-import { StyleSettings } from '@/types/beautifier';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { StyleSettings } from "@/types/beautifier";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 interface SettingsPanelProps {
   settings: StyleSettings;
   onSettingsChange: (settings: StyleSettings) => void;
 }
 
-export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps) => {
-  const updateSetting = <K extends keyof StyleSettings>(key: K, value: StyleSettings[K]) => {
+export const SettingsPanel = ({
+  settings,
+  onSettingsChange,
+}: SettingsPanelProps) => {
+  const updateSetting = <K extends keyof StyleSettings>(
+    key: K,
+    value: StyleSettings[K]
+  ) => {
     onSettingsChange({ ...settings, [key]: value });
   };
 
@@ -36,7 +42,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
         </div>
         <Slider
           value={[settings.padding]}
-          onValueChange={([value]) => updateSetting('padding', value)}
+          onValueChange={([value]) => updateSetting("padding", value)}
           min={16}
           max={120}
           step={4}
@@ -54,7 +60,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
         </div>
         <Slider
           value={[settings.borderRadius]}
-          onValueChange={([value]) => updateSetting('borderRadius', value)}
+          onValueChange={([value]) => updateSetting("borderRadius", value)}
           min={0}
           max={48}
           step={2}
@@ -72,7 +78,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
         </div>
         <Slider
           value={[settings.shadowIntensity]}
-          onValueChange={([value]) => updateSetting('shadowIntensity', value)}
+          onValueChange={([value]) => updateSetting("shadowIntensity", value)}
           min={0}
           max={80}
           step={5}
@@ -85,7 +91,9 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
         <Label className="text-sm font-medium">Aspect Ratio</Label>
         <Select
           value={settings.aspectRatio}
-          onValueChange={(value) => updateSetting('aspectRatio', value as StyleSettings['aspectRatio'])}
+          onValueChange={(value) =>
+            updateSetting("aspectRatio", value as StyleSettings["aspectRatio"])
+          }
         >
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -107,7 +115,7 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
         <Label className="text-sm font-medium">Gradient Background</Label>
         <Switch
           checked={settings.useGradient}
-          onCheckedChange={(checked) => updateSetting('useGradient', checked)}
+          onCheckedChange={(checked) => updateSetting("useGradient", checked)}
         />
       </div>
 
@@ -121,15 +129,17 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
                 <input
                   type="color"
                   value={settings.gradientStart}
-                  onChange={(e) => updateSetting('gradientStart', e.target.value)}
-                  className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
+                  onChange={(e) =>
+                    updateSetting("gradientStart", e.target.value)
+                  }
+                  className="w-10 h-10 rounded-sm border-2 border-border cursor-pointer appearance-none bg-transparent"
                 />
               </div>
               <input
                 type="text"
                 value={settings.gradientStart}
-                onChange={(e) => updateSetting('gradientStart', e.target.value)}
-                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
+                onChange={(e) => updateSetting("gradientStart", e.target.value)}
+                className="flex-1 px-3 py-2 text-xs font-mono rounded-sm border border-input bg-background"
               />
             </div>
           </div>
@@ -139,33 +149,35 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
               <input
                 type="color"
                 value={settings.gradientEnd}
-                onChange={(e) => updateSetting('gradientEnd', e.target.value)}
-                className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
+                onChange={(e) => updateSetting("gradientEnd", e.target.value)}
+                className="w-10 h-10 rounded-sm border-2 border-border cursor-pointer appearance-none bg-transparent"
               />
               <input
                 type="text"
                 value={settings.gradientEnd}
-                onChange={(e) => updateSetting('gradientEnd', e.target.value)}
-                className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
+                onChange={(e) => updateSetting("gradientEnd", e.target.value)}
+                className="flex-1 px-3 py-2 text-xs font-mono rounded-sm border border-input bg-background"
               />
             </div>
           </div>
         </div>
       ) : (
         <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Background Color</Label>
+          <Label className="text-xs text-muted-foreground">
+            Background Color
+          </Label>
           <div className="flex items-center gap-2">
             <input
               type="color"
               value={settings.backgroundColor}
-              onChange={(e) => updateSetting('backgroundColor', e.target.value)}
-              className="w-10 h-10 rounded-lg border-2 border-border cursor-pointer appearance-none bg-transparent"
+              onChange={(e) => updateSetting("backgroundColor", e.target.value)}
+              className="w-10 h-10  border-2 border-border cursor-pointer appearance-none bg-transparent"
             />
             <input
               type="text"
               value={settings.backgroundColor}
-              onChange={(e) => updateSetting('backgroundColor', e.target.value)}
-              className="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-input bg-background"
+              onChange={(e) => updateSetting("backgroundColor", e.target.value)}
+              className="flex-1 px-3 py-2 text-xs font-mono rounded-sm border border-input bg-background"
             />
           </div>
         </div>
@@ -177,11 +189,15 @@ export const SettingsPanel = ({ settings, onSettingsChange }: SettingsPanelProps
       <div className="flex items-center justify-between py-1">
         <div className="space-y-0.5">
           <Label className="text-sm font-medium">Blur Effect</Label>
-          <p className="text-[11px] text-muted-foreground">Screenshot as blurred backdrop</p>
+          <p className="text-[11px] text-muted-foreground">
+            Screenshot as blurred backdrop
+          </p>
         </div>
         <Switch
           checked={settings.blurBackground}
-          onCheckedChange={(checked) => updateSetting('blurBackground', checked)}
+          onCheckedChange={(checked) =>
+            updateSetting("blurBackground", checked)
+          }
         />
       </div>
     </div>
