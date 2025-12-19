@@ -1,5 +1,11 @@
-import { Download, Loader2, CheckCircle2, FileImage, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import {
+  Download,
+  Loader2,
+  CheckCircle2,
+  FileImage,
+  ChevronDown,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,17 +13,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { toast } from 'sonner';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ExportButtonProps {
-  onExport: (format: 'png' | 'jpeg' | 'webp') => string | null;
+  onExport: (format: "png" | "jpeg" | "webp") => string | null;
   disabled?: boolean;
 }
 
-type ExportFormat = 'png' | 'jpeg' | 'webp';
+type ExportFormat = "png" | "jpeg" | "webp";
 
 interface FormatOption {
   value: ExportFormat;
@@ -28,35 +34,35 @@ interface FormatOption {
 
 const formatOptions: FormatOption[] = [
   {
-    value: 'png',
-    label: 'PNG',
-    description: 'Lossless, best quality',
-    extension: 'png',
+    value: "png",
+    label: "PNG",
+    description: "Lossless, best quality",
+    extension: "png",
   },
   {
-    value: 'jpeg',
-    label: 'JPEG',
-    description: 'Smaller file size',
-    extension: 'jpg',
+    value: "jpeg",
+    label: "JPEG",
+    description: "Smaller file size",
+    extension: "jpg",
   },
   {
-    value: 'webp',
-    label: 'WebP',
-    description: 'Modern, balanced',
-    extension: 'webp',
+    value: "webp",
+    label: "WebP",
+    description: "Modern, balanced",
+    extension: "webp",
   },
 ];
 
 export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
   const [isExporting, setIsExporting] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('png');
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("png");
   const [lastExported, setLastExported] = useState<ExportFormat | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleExport = async (format: ExportFormat) => {
     if (disabled) {
-      toast.error('Please upload an image first', {
-        description: 'You need to upload a screenshot before downloading',
+      toast.error("Please upload an image first", {
+        description: "You need to upload a screenshot before downloading",
       });
       return;
     }
@@ -64,27 +70,27 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
     setIsExporting(true);
     setDropdownOpen(false);
 
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
     const dataUrl = onExport(format);
     if (!dataUrl) {
-      toast.error('Failed to export image', {
-        description: 'Something went wrong while generating the image',
+      toast.error("Failed to export image", {
+        description: "Something went wrong while generating the image",
       });
       setIsExporting(false);
       return;
     }
 
-    const link = document.createElement('a');
-    const formatOption = formatOptions.find(f => f.value === format);
-    link.download = `beautified-${Date.now()}.${formatOption?.extension || 'png'}`;
+    const link = document.createElement("a");
+    const formatOption = formatOptions.find((f) => f.value === format);
+    link.download = `snaply-${Date.now()}.${formatOption?.extension || "png"}`;
     link.href = dataUrl;
     link.click();
 
     setLastExported(format);
     setSelectedFormat(format);
 
-    toast.success('Image downloaded successfully!', {
+    toast.success("Image downloaded successfully!", {
       description: `Saved as ${formatOption?.label} format`,
       icon: <CheckCircle2 className="w-4 h-4" />,
     });
@@ -94,7 +100,9 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
     setTimeout(() => setLastExported(null), 3000);
   };
 
-  const selectedFormatOption = formatOptions.find(f => f.value === selectedFormat);
+  const selectedFormatOption = formatOptions.find(
+    (f) => f.value === selectedFormat
+  );
 
   return (
     <div className="flex gap-2 w-full">
@@ -117,7 +125,9 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
         ) : (
           <>
             <Download className="w-4 h-4" />
-            <span className="relative">Download {selectedFormatOption?.label}</span>
+            <span className="relative">
+              Download {selectedFormatOption?.label}
+            </span>
           </>
         )}
       </Button>
@@ -133,17 +143,15 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
               dropdownOpen && "border-primary bg-primary/5"
             )}
           >
-            <ChevronDown className={cn(
-              "w-4 h-4 transition-transform duration-200",
-              dropdownOpen && "rotate-180"
-            )} />
+            <ChevronDown
+              className={cn(
+                "w-4 h-4 transition-transform duration-200",
+                dropdownOpen && "rotate-180"
+              )}
+            />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="end" 
-          className="w-56"
-          sideOffset={8}
-        >
+        <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
           <DropdownMenuLabel className="flex items-center gap-2">
             <FileImage className="w-4 h-4 text-primary" />
             Export Format
