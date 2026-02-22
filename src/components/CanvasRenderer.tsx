@@ -11,6 +11,20 @@ export interface CanvasRendererRef {
   exportImage: (format?: 'png' | 'jpeg' | 'webp', quality?: number) => string | null;
 }
 
+const getCenteredPosition = (
+  canvasWidth: number,
+  canvasHeight: number,
+  imageWidth: number,
+  imageHeight: number,
+  shadowOffsetX: number,
+  shadowOffsetY: number
+) => {
+  // Compensate for shadow offsets and snap to full pixels to avoid subtle visual drift.
+  const x = Math.round((canvasWidth - imageWidth) / 2 - shadowOffsetX / 2);
+  const y = Math.round((canvasHeight - imageHeight) / 2 - shadowOffsetY / 2);
+  return { x, y };
+};
+
 const getAspectRatioDimensions = (
   aspectRatio: StyleSettings['aspectRatio'],
   imageWidth: number,
@@ -119,9 +133,17 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
 
       if (!loadedImage) return;
 
-      // Calculate centered position
-      const x = (canvas.width - loadedImage.width) / 2;
-      const y = (canvas.height - loadedImage.height) / 2;
+      // Center based on visual footprint when drop shadow is offset.
+      const shadowOffsetX = 0;
+      const shadowOffsetY = settings.shadowIntensity > 0 ? settings.shadowIntensity / 2 : 0;
+      const { x, y } = getCenteredPosition(
+        canvas.width,
+        canvas.height,
+        loadedImage.width,
+        loadedImage.height,
+        shadowOffsetX,
+        shadowOffsetY
+      );
 
       // Draw blurred background if enabled
       if (settings.blurBackground) {
@@ -146,8 +168,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
         ctx.save();
         ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
         ctx.shadowBlur = settings.shadowIntensity * 1.5;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = settings.shadowIntensity / 2;
+        ctx.shadowOffsetX = shadowOffsetX;
+        ctx.shadowOffsetY = shadowOffsetY;
 
         // Draw shadow shape
         ctx.beginPath();
@@ -192,8 +214,16 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
         }
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const x = (canvas.width - loadedImage.width) / 2;
-        const y = (canvas.height - loadedImage.height) / 2;
+        const shadowOffsetX = 0;
+        const shadowOffsetY = settings.shadowIntensity > 0 ? settings.shadowIntensity / 2 : 0;
+        const { x, y } = getCenteredPosition(
+          canvas.width,
+          canvas.height,
+          loadedImage.width,
+          loadedImage.height,
+          shadowOffsetX,
+          shadowOffsetY
+        );
 
         if (settings.blurBackground) {
           ctx.save();
@@ -215,8 +245,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
           ctx.save();
           ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
           ctx.shadowBlur = settings.shadowIntensity * 1.5;
-          ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = settings.shadowIntensity / 2;
+          ctx.shadowOffsetX = shadowOffsetX;
+          ctx.shadowOffsetY = shadowOffsetY;
           ctx.beginPath();
           roundRect(ctx, x, y, loadedImage.width, loadedImage.height, settings.borderRadius);
           ctx.fillStyle = 'white';
@@ -240,8 +270,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
     // Calculate display size to fit container
     const maxWidth = containerWidth - 48;
     const scale = Math.min(1, maxWidth / canvasSize.width);
-    const displayWidth = canvasSize.width * scale;
-    const displayHeight = canvasSize.height * scale;
+    const displayWidth = Math.round(canvasSize.width * scale);
+    const displayHeight = Math.round(canvasSize.height * scale);
 
     return (
       <div ref={containerRef} className="flex items-center justify-center w-full min-h-[360px] p-5 bg-gradient-to-br from-background to-accent/10 rounded-xl border border-border/60">
