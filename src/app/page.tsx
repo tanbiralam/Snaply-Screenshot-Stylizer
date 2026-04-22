@@ -42,6 +42,7 @@ export default function Home() {
   const [settings, setSettings] = useState<StyleSettings>(defaultSettings);
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
 
   // ── Restore settings from URL hash on mount ──────────────────────────────
   useEffect(() => {
@@ -79,6 +80,16 @@ export default function Home() {
   const handleSettingsChange = useCallback((newSettings: StyleSettings) => {
     setSettings(newSettings);
     setActivePreset(null);
+  }, []);
+
+  // When image changes, measure its dimensions to derive the aspect ratio
+  // for the device recommendation system.
+  const handleImageUpload = useCallback((dataUrl: string) => {
+    setImage(dataUrl);
+    setImageAspectRatio(null);
+    const img = new Image();
+    img.onload = () => setImageAspectRatio(img.width / img.height);
+    img.src = dataUrl;
   }, []);
 
   const handleExport = useCallback(
@@ -154,9 +165,9 @@ export default function Home() {
         {/* Center — canvas / upload area */}
         <main className="flex min-w-0 flex-1 flex-col items-center justify-center overflow-hidden p-4 md:p-6 lg:p-8">
           {image ? (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-4">
-              {/* Canvas preview */}
-              <div className="relative flex min-h-0 flex-1 w-full items-center justify-center">
+            <div className="flex h-full w-full flex-col items-center gap-4">
+              {/* Canvas preview — fills available height */}
+              <div className="relative flex min-h-0 flex-1 w-full">
                 <CanvasRenderer
                   ref={canvasRef}
                   image={image}
@@ -168,7 +179,7 @@ export default function Home() {
               <div className="flex shrink-0 items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setImage(null)}
+                  onClick={() => { setImage(null); setImageAspectRatio(null); }}
                   className={cn(
                     "flex items-center gap-1.5 rounded-lg border border-border/50 bg-card/60 px-3 py-2",
                     "text-xs font-medium text-muted-foreground transition-all duration-150",
@@ -184,7 +195,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="w-full max-w-lg">
-              <ImageUpload onImageUpload={setImage} hasImage={!!image} />
+              <ImageUpload onImageUpload={handleImageUpload} hasImage={!!image} />
             </div>
           )}
         </main>
@@ -195,6 +206,7 @@ export default function Home() {
             <SettingsPanel
               settings={settings}
               onSettingsChange={handleSettingsChange}
+              imageAspectRatio={imageAspectRatio}
             />
           </div>
         </aside>

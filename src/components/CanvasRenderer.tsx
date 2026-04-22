@@ -1,18 +1,22 @@
+"use client";
+
 import {
   useRef,
   useEffect,
   useState,
   forwardRef,
   useImperativeHandle,
+  useCallback,
 } from "react";
 import { StyleSettings } from "@/types";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   drawDeviceFrame,
   getDeviceColors,
   getDeviceLayout,
 } from "@/lib/deviceMockups";
+import { cn } from "@/lib/utils";
 
 interface CanvasRendererProps {
   image: string | null;
@@ -24,7 +28,11 @@ export interface CanvasRendererRef {
     format?: "png" | "jpeg" | "webp",
     quality?: number
   ) => string | null;
+  /** Width ÷ height of the currently loaded image, or null. */
+  getImageAspectRatio: () => number | null;
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
  * Returns the top-left position to center a box on the canvas,
@@ -91,16 +99,6 @@ const getAspectRatioDimensions = (
  * The screenshot content rectangle is excluded using a clipping region built
  * with the even-odd fill rule, so the actual screenshot pixel data is never
  * touched.
- *
- * @param ctx       Destination context.
- * @param w         Canvas logical width.
- * @param h         Canvas logical height.
- * @param intensity 0–100 — maps to a max per-pixel noise alpha of 0–55%.
- * @param contentX  Screenshot rect left edge (grain-free zone).
- * @param contentY  Screenshot rect top edge.
- * @param contentW  Screenshot rect width.
- * @param contentH  Screenshot rect height.
- * @param contentR  Screenshot rect corner radius.
  */
 function drawGrain(
   ctx: CanvasRenderingContext2D,
@@ -115,8 +113,6 @@ function drawGrain(
 ) {
   if (intensity <= 0) return;
 
-  // --- Generate noise on a small off-screen canvas -------------------------
-  // Downscale 2× for a slightly coarser, more filmic texture and better perf.
   const scale = 2;
   const nw = Math.ceil(w / scale);
   const nh = Math.ceil(h / scale);
@@ -129,31 +125,20 @@ function drawGrain(
 
   const imageData = nc.createImageData(nw, nh);
   const data = imageData.data;
-  // Map 0–100 → max per-pixel alpha 0–0.55 so grain is never overpowering.
   const maxAlpha = (intensity / 100) * 0.55;
 
   for (let i = 0; i < data.length; i += 4) {
     const luma = Math.random() * 255;
-    // Subtle warm/cool channel variation for organic feel.
     data[i]     = Math.max(0, Math.min(255, luma + (Math.random() - 0.5) * 14));
     data[i + 1] = luma;
     data[i + 2] = Math.max(0, Math.min(255, luma + (Math.random() - 0.5) * 14));
-    // Randomise per-pixel alpha so the texture is non-uniform.
     data[i + 3] = Math.random() * maxAlpha * 255;
   }
   nc.putImageData(imageData, 0, 0);
 
-  // --- Apply grain, clipping OUT the screenshot area -----------------------
   ctx.save();
-
-  // Build a clip path: outer rect (full canvas) minus the inner screenshot rect.
-  // Using the even-odd rule, overlapping regions cancel out → the screenshot
-  // rect is excluded from the clip, so nothing we draw will touch it.
   ctx.beginPath();
-  // Outer rectangle (full canvas).
   ctx.rect(0, 0, w, h);
-  // Inner rectangle (screenshot area) — drawn in the same path so even-odd
-  // rule makes the intersection empty.
   const r = Math.min(contentR, contentW / 2, contentH / 2);
   ctx.moveTo(contentX + r, contentY);
   ctx.lineTo(contentX + contentW - r, contentY);
@@ -167,8 +152,6 @@ function drawGrain(
   ctx.closePath();
   ctx.clip("evenodd");
 
-  // "overlay" blend: bright noise → lighter, dark noise → darker, exactly
-  // like analogue film grain interacting with the scene.
   ctx.globalCompositeOperation = "overlay";
   ctx.drawImage(noiseCanvas, 0, 0, w, h);
 
@@ -200,16 +183,175 @@ function roundRect(
   ctx.closePath();
 }
 
+/**
+ * Draws the image inside the content area using letterboxing (object-fit:
+ * contain semantics). If the image ratio matches the content area, it fills
+ * edge-to-edge; if not, neutral padding bars are added inside the frame
+ * so the image is never stretched or cropped.
+ */
+function drawImageLetterboxed(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  contentX: number,
+  contentY: number,
+  contentW: number,
+  contentH: number,
+  contentRadius: number
+) {
+  const imgRatio = img.width / img.height;
+  const areaRatio = contentW / contentH;
+
+  let drawW: number;
+  let drawH: number;
+  let drawX: number;
+  let drawY: number;
+
+  if (imgRatio > areaRatio) {
+    // Image is wider than the content area — pillarbox (top/bottom bars)
+    drawW = contentW;
+    drawH = contentW / imgRatio;
+    drawX = contentX;
+    drawY = contentY + (contentH - drawH) / 2;
+  } else if (imgRatio < areaRatio) {
+    // Image is taller — letterbox (left/right bars)
+    drawH = contentH;
+    drawW = contentH * imgRatio;
+    drawX = contentX + (contentW - drawW) / 2;
+    drawY = contentY;
+  } else {
+    // Exact match — fill the full content area
+    drawW = contentW;
+    drawH = contentH;
+    drawX = contentX;
+    drawY = contentY;
+  }
+
+  // Clip to the content rounded rectangle, then draw the image.
+  ctx.save();
+  ctx.beginPath();
+  roundRect(ctx, contentX, contentY, contentW, contentH, contentRadius);
+  ctx.clip();
+
+  // Fill letterbox background with a neutral very-dark-or-light tone.
+  // Using a semi-transparent black so it blends with the device frame colour.
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(contentX, contentY, contentW, contentH);
+
+  ctx.drawImage(img, drawX, drawY, drawW, drawH);
+  ctx.restore();
+}
+
+// ─── Zoom controller bar ─────────────────────────────────────────────────────
+
+const ZOOM_MIN = 0.25;
+const ZOOM_MAX = 2.0;
+const ZOOM_STEP = 0.1;
+
+interface ZoomBarProps {
+  zoom: number | null;   // null = auto-fit
+  autoFitScale: number;  // the computed auto-fit scale
+  onZoomChange: (z: number | null) => void;
+}
+
+const ZoomBar = ({ zoom, autoFitScale, onZoomChange }: ZoomBarProps) => {
+  const effectiveScale = zoom ?? autoFitScale;
+  const pct = Math.round(effectiveScale * 100);
+  const isAuto = zoom === null;
+
+  const step = (delta: number) => {
+    const base = zoom ?? autoFitScale;
+    const next = Math.round((base + delta) * 10) / 10;
+    onZoomChange(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next)));
+  };
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 rounded-xl border border-border/50",
+        "bg-card/90 backdrop-blur-sm shadow-lg px-1.5 py-1",
+        "select-none"
+      )}
+    >
+      {/* Zoom out */}
+      <button
+        type="button"
+        onClick={() => step(-ZOOM_STEP)}
+        disabled={effectiveScale <= ZOOM_MIN}
+        className="flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground disabled:opacity-30"
+        title="Zoom out"
+      >
+        <ZoomOut className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Percentage readout */}
+      <span className="w-10 text-center font-mono text-[11px] font-medium text-foreground">
+        {pct}%
+      </span>
+
+      {/* Zoom in */}
+      <button
+        type="button"
+        onClick={() => step(ZOOM_STEP)}
+        disabled={effectiveScale >= ZOOM_MAX}
+        className="flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground disabled:opacity-30"
+        title="Zoom in"
+      >
+        <ZoomIn className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Divider */}
+      <div className="mx-0.5 h-4 w-px bg-border/60" />
+
+      {/* Fit button */}
+      <button
+        type="button"
+        onClick={() => onZoomChange(null)}
+        className={cn(
+          "flex h-6 items-center justify-center rounded-lg px-2 text-[10px] font-semibold transition-colors",
+          isAuto
+            ? "bg-primary/15 text-primary"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+        )}
+        title="Fit to screen"
+      >
+        Fit
+      </button>
+
+      {/* 100% button */}
+      <button
+        type="button"
+        onClick={() => onZoomChange(1)}
+        className={cn(
+          "flex h-6 items-center justify-center rounded-lg px-2 text-[10px] font-semibold transition-colors",
+          !isAuto && Math.abs(effectiveScale - 1) < 0.01
+            ? "bg-primary/15 text-primary"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+        )}
+        title="100% — actual pixel size"
+      >
+        <Maximize2 className="mr-1 h-2.5 w-2.5" />
+        100%
+      </button>
+    </div>
+  );
+};
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export const CanvasRenderer = forwardRef<
   CanvasRendererRef,
   CanvasRendererProps
 >(({ image, settings }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const autoFitScaleRef = useRef(1);
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 500 });
   const [containerWidth, setContainerWidth] = useState(700);
+  const [containerHeight, setContainerHeight] = useState(500);
   const [isLoading, setIsLoading] = useState(false);
+  // null = auto-fit; number = explicit zoom multiplier
+  const [zoomLevel, setZoomLevel] = useState<number | null>(null);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -220,6 +362,8 @@ export const CanvasRenderer = forwardRef<
       const img = new Image();
       img.onload = () => {
         setLoadedImage(img);
+        // Reset zoom when a new image is loaded
+        setZoomLevel(null);
         setTimeout(() => setIsLoading(false), 200);
       };
       img.onerror = () => {
@@ -230,24 +374,25 @@ export const CanvasRenderer = forwardRef<
     } else {
       setLoadedImage(null);
       setIsLoading(false);
+      setZoomLevel(null);
     }
   }, [image]);
 
-  // Keep track of the container's rendered width so we can scale the preview.
+  // Keep track of the container's rendered size so we can scale the preview.
   useEffect(() => {
-    const updateWidth = () => {
+    const updateSize = () => {
       if (containerRef.current) {
         setContainerWidth(containerRef.current.clientWidth);
+        setContainerHeight(containerRef.current.clientHeight);
       }
     };
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    updateSize();
+    const ro = new ResizeObserver(updateSize);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
   }, []);
 
   // Recompute canvas dimensions when image, aspect ratio, padding, or mockup changes.
-  // We base dimensions on the device frame bounding box (not raw image) so the
-  // frame chrome is always fully visible.
   useEffect(() => {
     if (!loadedImage) return;
     const layout = getDeviceLayout(
@@ -271,166 +416,169 @@ export const CanvasRenderer = forwardRef<
     settings.borderRadius,
   ]);
 
+  // Ctrl+wheel to zoom.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+      setZoomLevel((prev) => {
+        const base = prev ?? autoFitScaleRef.current;
+        const next = Math.round((base + delta) * 10) / 10;
+        return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, next));
+      });
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+    // autoFitScaleRef is a stable ref; wheel reads current value via ref.current.
+  }, []);
+
   /**
    * Core draw routine shared by the live preview and the 2x export path.
    *
    * Drawing order:
    *   1. Background (gradient or solid colour)
    *   2. Blurred backdrop (optional glassmorphism effect)
-   *   3. Drop shadow (emitted from a filled frame-shape rect)
-   *   4. Device frame chrome (bezels, title bar, traffic lights, notch …)
-   *   5. Screenshot clipped inside the content area
-   *
-   * canvasW / canvasH are the *logical* pixel dimensions of the destination
-   * canvas. When exporting at 2x the context has already been scaled, so we
-   * still pass the logical size here and let the scale transform handle the
-   * physical pixel count.
+   *   2b. Grain overlay (background only)
+   *   3. Drop shadow
+   *   4. Device frame chrome
+   *   5. Screenshot (letterboxed inside content area)
    */
-  const drawToContext = (
-    ctx: CanvasRenderingContext2D,
-    canvasW: number,
-    canvasH: number
-  ) => {
-    ctx.clearRect(0, 0, canvasW, canvasH);
+  const drawToContext = useCallback(
+    (
+      ctx: CanvasRenderingContext2D,
+      canvasW: number,
+      canvasH: number
+    ) => {
+      ctx.clearRect(0, 0, canvasW, canvasH);
 
-    // --- 1. Background ---
-    if (settings.useGradient) {
-      const gradient = ctx.createLinearGradient(0, 0, canvasW, canvasH);
-      gradient.addColorStop(0, settings.gradientStart);
-      gradient.addColorStop(1, settings.gradientEnd);
-      ctx.fillStyle = gradient;
-    } else {
-      ctx.fillStyle = settings.backgroundColor;
-    }
-    ctx.fillRect(0, 0, canvasW, canvasH);
-
-    if (!loadedImage) return;
-
-    const layout = getDeviceLayout(
-      settings.deviceMockup,
-      loadedImage.width,
-      loadedImage.height,
-      settings.borderRadius
-    );
-
-    // Shadow offset — only vertical so the shadow falls naturally below.
-    const shadowOffsetX = 0;
-    const shadowOffsetY =
-      settings.shadowIntensity > 0 ? settings.shadowIntensity / 2 : 0;
-
-    // Top-left corner of the entire device frame bounding box on the canvas.
-    const { x: frameX, y: frameY } = getCenteredPosition(
-      canvasW,
-      canvasH,
-      layout.frameWidth,
-      layout.frameHeight,
-      shadowOffsetX,
-      shadowOffsetY
-    );
-
-    // --- 2. Blurred backdrop ---
-    if (settings.blurBackground) {
-      ctx.save();
-      ctx.filter = "blur(40px) saturate(1.2)";
-      ctx.globalAlpha = 0.7;
-      ctx.drawImage(loadedImage, -80, -80, canvasW + 160, canvasH + 160);
-      ctx.restore();
-
-      // Re-apply gradient overlay with reduced opacity so the blur still shows.
+      // --- 1. Background ---
       if (settings.useGradient) {
         const gradient = ctx.createLinearGradient(0, 0, canvasW, canvasH);
-        gradient.addColorStop(0, settings.gradientStart + "90");
-        gradient.addColorStop(1, settings.gradientEnd + "90");
+        gradient.addColorStop(0, settings.gradientStart);
+        gradient.addColorStop(1, settings.gradientEnd);
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvasW, canvasH);
+      } else {
+        ctx.fillStyle = settings.backgroundColor;
       }
-    }
+      ctx.fillRect(0, 0, canvasW, canvasH);
 
-    // Outer corner radius for the frame shadow shape.
-    // When a device is active we use a fixed 14 px so the shadow follows the
-    // device bezel shape; otherwise we respect the user's borderRadius slider.
-    const frameOuterRadius =
-      settings.deviceMockup === "none" ? settings.borderRadius : 14;
+      if (!loadedImage) return;
 
-    // --- 2b. Grain overlay (background only, screenshot area excluded) ---
-    if (settings.grainIntensity > 0 && loadedImage) {
-      const contentX = frameX + layout.contentX;
-      const contentY = frameY + layout.contentY;
-      drawGrain(
-        ctx,
+      const layout = getDeviceLayout(
+        settings.deviceMockup,
+        loadedImage.width,
+        loadedImage.height,
+        settings.borderRadius
+      );
+
+      // Shadow offset — only vertical so the shadow falls naturally below.
+      const shadowOffsetX = 0;
+      const shadowOffsetY =
+        settings.shadowIntensity > 0 ? settings.shadowIntensity / 2 : 0;
+
+      // Top-left corner of the entire device frame bounding box on the canvas.
+      const { x: frameX, y: frameY } = getCenteredPosition(
         canvasW,
         canvasH,
-        settings.grainIntensity,
+        layout.frameWidth,
+        layout.frameHeight,
+        shadowOffsetX,
+        shadowOffsetY
+      );
+
+      // --- 2. Blurred backdrop ---
+      if (settings.blurBackground) {
+        ctx.save();
+        ctx.filter = "blur(40px) saturate(1.2)";
+        ctx.globalAlpha = 0.7;
+        ctx.drawImage(loadedImage, -80, -80, canvasW + 160, canvasH + 160);
+        ctx.restore();
+
+        if (settings.useGradient) {
+          const gradient = ctx.createLinearGradient(0, 0, canvasW, canvasH);
+          gradient.addColorStop(0, settings.gradientStart + "90");
+          gradient.addColorStop(1, settings.gradientEnd + "90");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvasW, canvasH);
+        }
+      }
+
+      const frameOuterRadius =
+        settings.deviceMockup === "none" ? settings.borderRadius : 14;
+
+      // --- 2b. Grain overlay (background only) ---
+      if (settings.grainIntensity > 0) {
+        const gX = frameX + layout.contentX;
+        const gY = frameY + layout.contentY;
+        drawGrain(
+          ctx,
+          canvasW,
+          canvasH,
+          settings.grainIntensity,
+          gX,
+          gY,
+          layout.contentWidth,
+          layout.contentHeight,
+          layout.contentRadius
+        );
+      }
+
+      // --- 3. Drop shadow ---
+      if (settings.shadowIntensity > 0) {
+        ctx.save();
+        ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
+        ctx.shadowBlur = settings.shadowIntensity * 1.5;
+        ctx.shadowOffsetX = shadowOffsetX;
+        ctx.shadowOffsetY = shadowOffsetY;
+
+        ctx.beginPath();
+        roundRect(
+          ctx,
+          frameX,
+          frameY,
+          layout.frameWidth,
+          layout.frameHeight,
+          frameOuterRadius
+        );
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // --- 4. Device frame chrome ---
+      if (settings.deviceMockup !== "none") {
+        const colors = getDeviceColors(isDark);
+        drawDeviceFrame(
+          ctx,
+          settings.deviceMockup,
+          frameX,
+          frameY,
+          layout,
+          colors,
+          frameOuterRadius
+        );
+      }
+
+      // --- 5. Screenshot — letterboxed to content area ---
+      const contentX = frameX + layout.contentX;
+      const contentY = frameY + layout.contentY;
+
+      drawImageLetterboxed(
+        ctx,
+        loadedImage,
         contentX,
         contentY,
         layout.contentWidth,
         layout.contentHeight,
         layout.contentRadius
       );
-    }
-
-    // --- 3. Drop shadow ---
-    // We draw a filled rect with canvas shadow APIs. The rect itself is
-    // immediately painted over by the frame / screenshot layers above it.
-    if (settings.shadowIntensity > 0) {
-      ctx.save();
-      ctx.shadowColor = `rgba(0, 0, 0, ${settings.shadowIntensity / 100})`;
-      ctx.shadowBlur = settings.shadowIntensity * 1.5;
-      ctx.shadowOffsetX = shadowOffsetX;
-      ctx.shadowOffsetY = shadowOffsetY;
-
-      ctx.beginPath();
-      roundRect(
-        ctx,
-        frameX,
-        frameY,
-        layout.frameWidth,
-        layout.frameHeight,
-        frameOuterRadius
-      );
-      ctx.fillStyle = "white";
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // --- 4. Device frame chrome ---
-    if (settings.deviceMockup !== "none") {
-      const colors = getDeviceColors(isDark);
-      drawDeviceFrame(
-        ctx,
-        settings.deviceMockup,
-        frameX,
-        frameY,
-        layout,
-        colors,
-        frameOuterRadius
-      );
-    }
-
-    // --- 5. Screenshot (clipped to content area) ---
-    const contentX = frameX + layout.contentX;
-    const contentY = frameY + layout.contentY;
-
-    ctx.save();
-    ctx.beginPath();
-    roundRect(
-      ctx,
-      contentX,
-      contentY,
-      layout.contentWidth,
-      layout.contentHeight,
-      layout.contentRadius
-    );
-    ctx.clip();
-    ctx.drawImage(
-      loadedImage,
-      contentX,
-      contentY,
-      layout.contentWidth,
-      layout.contentHeight
-    );
-    ctx.restore();
-  };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadedImage, settings, isDark]
+  );
 
   // Trigger a preview redraw whenever any relevant state changes.
   useEffect(() => {
@@ -439,12 +587,9 @@ export const CanvasRenderer = forwardRef<
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     drawToContext(ctx, canvas.width, canvas.height);
-    // drawToContext is reconstructed on every render; listing its captured
-    // dependencies directly is more reliable than listing the function itself.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadedImage, settings, canvasSize, isDark]);
+  }, [drawToContext, canvasSize]);
 
-  // Expose exportImage to parent via ref.
+  // Expose exportImage and getImageAspectRatio to parent via ref.
   useImperativeHandle(ref, () => ({
     exportImage: (
       format: "png" | "jpeg" | "webp" = "png",
@@ -453,7 +598,6 @@ export const CanvasRenderer = forwardRef<
       const canvas = canvasRef.current;
       if (!canvas || !loadedImage) return null;
 
-      // Create a 2x resolution off-screen canvas for crisp retina exports.
       const exportCanvas = document.createElement("canvas");
       const scale = 2;
       exportCanvas.width = canvas.width * scale;
@@ -461,8 +605,6 @@ export const CanvasRenderer = forwardRef<
       const ctx = exportCanvas.getContext("2d");
       if (!ctx) return null;
 
-      // Scale the context so drawToContext can use logical pixel coordinates
-      // unchanged — the transform handles the physical 2x pixel count.
       ctx.scale(scale, scale);
       drawToContext(ctx, canvas.width, canvas.height);
 
@@ -474,21 +616,36 @@ export const CanvasRenderer = forwardRef<
             : "image/webp";
       return exportCanvas.toDataURL(mimeType, quality);
     },
+    getImageAspectRatio: () => {
+      if (!loadedImage) return null;
+      return loadedImage.width / loadedImage.height;
+    },
   }));
 
-  // Scale the preview canvas to fit inside the panel without overflow.
-  const maxWidth = containerWidth - 48;
-  const previewScale = Math.min(1, maxWidth / canvasSize.width);
-  const displayWidth = Math.round(canvasSize.width * previewScale);
-  const displayHeight = Math.round(canvasSize.height * previewScale);
+  // ── Zoom / scaling ──────────────────────────────────────────────────────────
+
+  const availableW = Math.max(120, containerWidth - 48);
+  const availableH = Math.max(120, containerHeight - 96); // leave room for zoom bar
+  const autoFitScale = Math.min(
+    1,
+    availableW / canvasSize.width,
+    availableH / canvasSize.height
+  );
+  // Keep the ref current so the wheel handler can read it without going stale.
+  autoFitScaleRef.current = autoFitScale;
+
+  const effectiveScale = zoomLevel ?? autoFitScale;
+  const displayWidth  = Math.round(canvasSize.width  * effectiveScale);
+  const displayHeight = Math.round(canvasSize.height * effectiveScale);
 
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center w-full min-h-[360px] p-5 bg-gradient-to-br from-background to-accent/10 rounded-xl border border-border/60"
+      className="relative flex w-full flex-1 flex-col items-center justify-center min-h-[360px] bg-gradient-to-br from-background to-accent/10 rounded-xl border border-border/60 overflow-hidden"
     >
+      {/* ── Canvas preview ── */}
       <div
-        className="relative rounded-lg overflow-hidden bg-card/80"
+        className="relative rounded-lg overflow-hidden bg-card/80 transition-shadow duration-200"
         style={{
           width: displayWidth,
           height: displayHeight,
@@ -531,6 +688,17 @@ export const CanvasRenderer = forwardRef<
           </div>
         )}
       </div>
+
+      {/* ── Zoom controller (only when an image is loaded) ── */}
+      {image && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+          <ZoomBar
+            zoom={zoomLevel}
+            autoFitScale={autoFitScale}
+            onZoomChange={setZoomLevel}
+          />
+        </div>
+      )}
     </div>
   );
 });

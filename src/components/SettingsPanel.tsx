@@ -19,6 +19,7 @@ import { DeviceTab } from "./DeviceTab";
 interface SettingsPanelProps {
   settings: StyleSettings;
   onSettingsChange: (settings: StyleSettings) => void;
+  imageAspectRatio?: number | null;
 }
 
 type ActiveTab = "style" | "device";
@@ -26,6 +27,7 @@ type ActiveTab = "style" | "device";
 export const SettingsPanel = ({
   settings,
   onSettingsChange,
+  imageAspectRatio,
 }: SettingsPanelProps) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("style");
 
@@ -309,7 +311,11 @@ export const SettingsPanel = ({
             </div>
           </div>
         ) : (
-          <DeviceTab settings={settings} onSettingsChange={onSettingsChange} />
+          <DeviceTab
+            settings={settings}
+            onSettingsChange={onSettingsChange}
+            imageAspectRatio={imageAspectRatio}
+          />
         )}
       </div>
     </div>

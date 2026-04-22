@@ -5,10 +5,18 @@ import { deviceMockupOptions } from "@/types";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import {
+  classifyImageRatio,
+  isDeviceIncompatible,
+  type DeviceCompatibility,
+} from "@/lib/deviceRecommendation";
+import { AlertTriangle, Sparkles } from "lucide-react";
 
 interface DeviceTabProps {
   settings: StyleSettings;
   onSettingsChange: (settings: StyleSettings) => void;
+  /** Width ÷ height of the uploaded image, or null if no image is loaded. */
+  imageAspectRatio?: number | null;
 }
 
 // ─── Mini SVG previews ────────────────────────────────────────────────────────
@@ -571,25 +579,34 @@ const DeviceCard = ({
   active,
   label,
   onClick,
+  incompatible,
 }: {
   device: DeviceMockup;
   active: boolean;
   label: string;
   onClick: () => void;
+  incompatible?: boolean;
 }) => (
   <button
     type="button"
     onClick={onClick}
     aria-pressed={active}
+    title={
+      incompatible
+        ? "May not look great with this image aspect ratio"
+        : undefined
+    }
     className={cn(
       "group relative flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-150",
       active
         ? "border-primary/50 bg-primary/5 shadow-sm"
-        : "border-border/40 bg-card/50 hover:border-border hover:bg-accent/20"
+        : "border-border/40 bg-card/50 hover:border-border hover:bg-accent/20",
+      incompatible && !active && "opacity-45"
     )}
   >
+    {/* Active checkmark */}
     {active && (
-      <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
+      <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary z-10">
         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
           <polyline
             points="1.5,4 3,5.5 6.5,2"
@@ -601,13 +618,21 @@ const DeviceCard = ({
         </svg>
       </span>
     )}
+    {/* Incompatibility badge (shown when not active) */}
+    {incompatible && !active && (
+      <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500/90 z-10">
+        <AlertTriangle className="w-2.5 h-2.5 text-white" />
+      </span>
+    )}
     <DevicePreviewSVG device={device} active={active} />
     <span
       className={cn(
         "text-[11px] font-medium transition-colors text-center leading-tight",
         active
           ? "text-primary"
-          : "text-muted-foreground group-hover:text-foreground"
+          : incompatible
+            ? "text-muted-foreground/60"
+            : "text-muted-foreground group-hover:text-foreground"
       )}
     >
       {label}
@@ -710,13 +735,25 @@ const DeviceContextOptions = ({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export const DeviceTab = ({ settings, onSettingsChange }: DeviceTabProps) => {
+export const DeviceTab = ({
+  settings,
+  onSettingsChange,
+  imageAspectRatio,
+}: DeviceTabProps) => {
   const updateDevice = (value: DeviceMockup) => {
     onSettingsChange({ ...settings, deviceMockup: value });
   };
 
-  const wideDevices: DeviceMockup[] = ["none", "browser", "macos", "ipad"];
+  // Compute compatibility whenever we have a loaded image ratio.
+  const compatibility: DeviceCompatibility | null =
+    imageAspectRatio != null
+      ? classifyImageRatio(imageAspectRatio)
+      : null;
 
+  const isIncompat = (d: DeviceMockup) =>
+    isDeviceIncompatible(d, compatibility);
+
+  const wideDevices: DeviceMockup[] = ["none", "browser", "macos", "ipad"];
   const portraitPhones: DeviceMockup[] = ["iphone", "android"];
   const landscapePhones: DeviceMockup[] = [
     "iphone-landscape",
@@ -726,8 +763,22 @@ export const DeviceTab = ({ settings, onSettingsChange }: DeviceTabProps) => {
   const labelFor = (d: DeviceMockup) =>
     deviceMockupOptions.find((o) => o.value === d)?.label ?? d;
 
+  // Show a warning if the currently selected device is incompatible.
+  const selectedIsIncompat =
+    settings.deviceMockup !== "none" && isIncompat(settings.deviceMockup);
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      {/* ── Recommendation banner ─────────────────────────────────────── */}
+      {compatibility && (
+        <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+          <p className="text-[11px] leading-relaxed text-foreground/80">
+            {compatibility.recommendation}
+          </p>
+        </div>
+      )}
+
       {/* Wide / desktop frames */}
       <div>
         <p className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -741,6 +792,7 @@ export const DeviceTab = ({ settings, onSettingsChange }: DeviceTabProps) => {
               active={settings.deviceMockup === device}
               label={labelFor(device)}
               onClick={() => updateDevice(device)}
+              incompatible={isIncompat(device)}
             />
           ))}
         </div>
@@ -759,6 +811,7 @@ export const DeviceTab = ({ settings, onSettingsChange }: DeviceTabProps) => {
               active={settings.deviceMockup === device}
               label={labelFor(device)}
               onClick={() => updateDevice(device)}
+              incompatible={isIncompat(device)}
             />
           ))}
         </div>
@@ -777,10 +830,22 @@ export const DeviceTab = ({ settings, onSettingsChange }: DeviceTabProps) => {
               active={settings.deviceMockup === device}
               label={labelFor(device)}
               onClick={() => updateDevice(device)}
+              incompatible={isIncompat(device)}
             />
           ))}
         </div>
       </div>
+
+      {/* Incompatibility warning for selected device */}
+      {selectedIsIncompat && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/8 px-3 py-2">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+          <p className="text-[11px] leading-relaxed text-amber-600 dark:text-amber-400">
+            This frame works best with a different image ratio. You may see
+            letterboxing or stretching.
+          </p>
+        </div>
+      )}
 
       {/* Contextual options */}
       <DeviceContextOptions
