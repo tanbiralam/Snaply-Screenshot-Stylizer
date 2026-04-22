@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface StyleTabProps {
   settings: StyleSettings;
@@ -122,6 +123,64 @@ const LayoutSection = ({ settings, updateSetting }: StyleTabProps) => (
 
 // ─── Section: Background ──────────────────────────────────────────────────────
 
+/** 8 compass directions mapped to their CSS gradient angles. */
+const DIRECTIONS: { angle: number; label: string; arrow: string }[] = [
+  { angle: 315, label: "Top-left",   arrow: "↖" },
+  { angle: 0,   label: "Up",         arrow: "↑" },
+  { angle: 45,  label: "Top-right",  arrow: "↗" },
+  { angle: 270, label: "Left",       arrow: "←" },
+  { angle: -1,  label: "",           arrow: ""  }, // centre blank
+  { angle: 90,  label: "Right",      arrow: "→" },
+  { angle: 225, label: "Bot-left",   arrow: "↙" },
+  { angle: 180, label: "Down",       arrow: "↓" },
+  { angle: 135, label: "Bot-right",  arrow: "↘" },
+];
+
+const GradientDirectionPicker = ({
+  angle,
+  onChange,
+}: {
+  angle: number;
+  onChange: (a: number) => void;
+}) => (
+  <div className="space-y-1.5">
+    <div className="flex items-center justify-between">
+      <Label className="text-[10px] text-muted-foreground">Direction</Label>
+      <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+        {angle}°
+      </span>
+    </div>
+    <div className="grid grid-cols-3 gap-1">
+      {DIRECTIONS.map((dir, i) => {
+        if (dir.angle === -1) {
+          return (
+            <div key={i} className="flex h-7 w-full items-center justify-center">
+              <div className="h-1.5 w-1.5 rounded-full bg-border" />
+            </div>
+          );
+        }
+        const isActive = angle === dir.angle;
+        return (
+          <button
+            key={i}
+            type="button"
+            title={dir.label}
+            onClick={() => onChange(dir.angle)}
+            className={cn(
+              "flex h-7 w-full items-center justify-center rounded-lg text-sm transition-all duration-100",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "border border-border/50 bg-card/60 text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+            )}
+          >
+            {dir.arrow}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
 const BackgroundSection = ({ settings, updateSetting }: StyleTabProps) => (
   <div className="space-y-4">
     <SectionLabel>Background</SectionLabel>
@@ -136,7 +195,11 @@ const BackgroundSection = ({ settings, updateSetting }: StyleTabProps) => (
       <div className="space-y-3">
         <div
           className="h-7 w-full rounded-lg border border-border/40"
-          style={{ background: `linear-gradient(135deg, ${settings.gradientStart}, ${settings.gradientEnd})` }}
+          style={{ background: `linear-gradient(${settings.gradientAngle ?? 135}deg, ${settings.gradientStart}, ${settings.gradientEnd})` }}
+        />
+        <GradientDirectionPicker
+          angle={settings.gradientAngle ?? 135}
+          onChange={(v) => updateSetting("gradientAngle", v)}
         />
         <ColorRow label="Start" value={settings.gradientStart} onChange={(v) => updateSetting("gradientStart", v)} />
         <ColorRow label="End"   value={settings.gradientEnd}   onChange={(v) => updateSetting("gradientEnd", v)} />
@@ -146,6 +209,7 @@ const BackgroundSection = ({ settings, updateSetting }: StyleTabProps) => (
     )}
   </div>
 );
+
 
 // ─── Section: Effects ─────────────────────────────────────────────────────────
 

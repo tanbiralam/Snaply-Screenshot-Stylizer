@@ -25,6 +25,37 @@ import {
 } from "@/lib/canvasHelpers";
 import { ZoomBar, ZOOM_MIN, ZOOM_MAX, ZOOM_STEP } from "@/components/ZoomBar";
 
+// ─── Gradient angle helper ────────────────────────────────────────────────────
+
+/**
+ * Converts a CSS-style gradient angle (degrees, 0 = upward) to the four
+ * x0,y0 → x1,y1 coordinates expected by CanvasRenderingContext2D.createLinearGradient.
+ *
+ * The approach uses the same formula as CSS: the gradient line runs through
+ * the centre of the rectangle at the given angle, stretching to the corners.
+ */
+function angleToGradientPoints(
+  angleDeg: number,
+  w: number,
+  h: number
+): [number, number, number, number] {
+  // CSS: 0deg = bottom→top. Canvas rotation: 0 = right. Offset by 90° and flip.
+  const rad = ((angleDeg - 90) * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  // Half-dimensions
+  const hw = w / 2;
+  const hh = h / 2;
+  // Project the gradient line onto the rectangle.
+  const len = Math.abs(hw * cos) + Math.abs(hh * sin);
+  return [
+    hw - len * cos,
+    hh - len * sin,
+    hw + len * cos,
+    hh + len * sin,
+  ];
+}
+
 // ─── Public types ─────────────────────────────────────────────────────────────
 
 interface CanvasRendererProps {
@@ -125,7 +156,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
 
         // 1. Background
         if (settings.useGradient) {
-          const g = ctx.createLinearGradient(0, 0, canvasW, canvasH);
+          const [x0, y0, x1, y1] = angleToGradientPoints(settings.gradientAngle ?? 135, canvasW, canvasH);
+          const g = ctx.createLinearGradient(x0, y0, x1, y1);
           g.addColorStop(0, settings.gradientStart);
           g.addColorStop(1, settings.gradientEnd);
           ctx.fillStyle = g;
@@ -152,7 +184,8 @@ export const CanvasRenderer = forwardRef<CanvasRendererRef, CanvasRendererProps>
           ctx.drawImage(loadedImage, -80, -80, canvasW + 160, canvasH + 160);
           ctx.restore();
           if (settings.useGradient) {
-            const g = ctx.createLinearGradient(0, 0, canvasW, canvasH);
+            const [x0, y0, x1, y1] = angleToGradientPoints(settings.gradientAngle ?? 135, canvasW, canvasH);
+            const g = ctx.createLinearGradient(x0, y0, x1, y1);
             g.addColorStop(0, settings.gradientStart + "90");
             g.addColorStop(1, settings.gradientEnd + "90");
             ctx.fillStyle = g;

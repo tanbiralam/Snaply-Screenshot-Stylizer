@@ -16,7 +16,7 @@ const PresetSwatch = ({ preset }: { preset: Preset }) => {
   const s = preset.settings;
   const bg =
     s.useGradient && s.gradientStart && s.gradientEnd
-      ? `linear-gradient(135deg, ${s.gradientStart}, ${s.gradientEnd})`
+      ? `linear-gradient(${(s as { gradientAngle?: number }).gradientAngle ?? 135}deg, ${s.gradientStart}, ${s.gradientEnd})`
       : (s.backgroundColor ?? "#1a1a2e");
 
   return (

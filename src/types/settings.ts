@@ -9,11 +9,11 @@ export interface StyleSettings {
   backgroundColor: string;
   gradientStart: string;
   gradientEnd: string;
+  gradientAngle: number;
   useGradient: boolean;
   blurBackground: boolean;
   aspectRatio: AspectRatio;
   deviceMockup: DeviceMockup;
-  /** Film-grain intensity applied ONLY to the background layer (0 = off, 100 = max). */
   grainIntensity: number;
 }
 
@@ -24,6 +24,7 @@ export const defaultSettings: StyleSettings = {
   backgroundColor: "#1a1a2e",
   gradientStart: "#667eea",
   gradientEnd: "#764ba2",
+  gradientAngle: 135,
   useGradient: true,
   blurBackground: false,
   aspectRatio: "free",

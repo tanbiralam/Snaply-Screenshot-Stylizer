@@ -93,7 +93,7 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
           {hasImage ? 'Replace screenshot' : isDragging ? 'Drop to upload' : 'Drop screenshot here'}
         </p>
         <p className="text-xs text-muted-foreground mt-1 transition-colors">
-          {hasImage ? 'Click or drag a new file' : 'or click to browse • PNG, JPG, WebP'}
+          {hasImage ? 'Click or drag a new file' : 'or click to browse • PNG, JPG, WebP • or Ctrl+V to paste'}
         </p>
       </div>
     </div>

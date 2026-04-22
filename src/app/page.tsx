@@ -92,6 +92,33 @@ export default function Home() {
     img.src = dataUrl;
   }, []);
 
+  // ── Global paste handler (Ctrl+V / Cmd+V) ────────────────────────────────
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (!file) continue;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const dataUrl = ev.target?.result as string;
+            if (dataUrl) {
+              handleImageUpload(dataUrl);
+              toast.success("Screenshot pasted!");
+            }
+          };
+          reader.readAsDataURL(file);
+          e.preventDefault();
+          break;
+        }
+      }
+    };
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [handleImageUpload]);
+
   const handleExport = useCallback(
     (format: "png" | "jpeg" | "webp"): string | null => {
       return canvasRef.current?.exportImage(format) ?? null;
