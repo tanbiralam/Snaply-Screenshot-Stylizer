@@ -28,15 +28,15 @@ export const DeviceCard = ({
     aria-pressed={active}
     title={incompatible ? "May not look great with this image aspect ratio" : undefined}
     className={cn(
-      "group relative flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-150",
+      "group relative flex flex-col items-center gap-2 rounded-lg border p-3 transition-all duration-150",
       active
-        ? "border-primary/50 bg-primary/5 shadow-sm"
-        : "border-border/40 bg-card/50 hover:border-border hover:bg-accent/20",
-      incompatible && !active && "opacity-45"
+        ? "border-foreground bg-secondary text-foreground shadow-sm"
+        : "border hairline bg-background hover:border-foreground/30 hover:bg-secondary",
+      incompatible && !active && "opacity-40"
     )}
   >
     {active && (
-      <span className="absolute right-2 top-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
+      <span className="absolute right-2 top-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-foreground">
         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
           <polyline points="1.5,4 3,5.5 6.5,2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -52,9 +52,9 @@ export const DeviceCard = ({
       className={cn(
         "text-center text-[11px] font-medium leading-tight transition-colors",
         active
-          ? "text-primary"
+          ? "text-foreground"
           : incompatible
-            ? "text-muted-foreground/60"
+            ? "text-muted-foreground/50"
             : "text-muted-foreground group-hover:text-foreground"
       )}
     >
@@ -65,59 +65,42 @@ export const DeviceCard = ({
 
 // ─── Contextual option panels ─────────────────────────────────────────────────
 
+const OptionRow = ({ label, defaultChecked }: { label: string; defaultChecked?: boolean }) => (
+  <div className="flex items-center justify-between">
+    <Label className="text-xs font-medium">{label}</Label>
+    <Switch defaultChecked={defaultChecked} />
+  </div>
+);
+
 const BrowserOptions = () => (
-  <div className="space-y-3 pt-1">
+  <div className="space-y-3">
     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Browser options</p>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Show URL bar</Label>
-      <Switch defaultChecked />
-    </div>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Traffic lights</Label>
-      <Switch defaultChecked />
-    </div>
+    <OptionRow label="Show URL bar" defaultChecked />
+    <OptionRow label="Traffic lights" defaultChecked />
   </div>
 );
 
 const MacOSOptions = () => (
-  <div className="space-y-3 pt-1">
+  <div className="space-y-3">
     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">macOS options</p>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Traffic lights</Label>
-      <Switch defaultChecked />
-    </div>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Window title</Label>
-      <Switch />
-    </div>
+    <OptionRow label="Traffic lights" defaultChecked />
+    <OptionRow label="Window title" />
   </div>
 );
 
 const PhoneOptions = ({ label }: { label: string }) => (
-  <div className="space-y-3 pt-1">
+  <div className="space-y-3">
     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{label} options</p>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Show notch</Label>
-      <Switch defaultChecked />
-    </div>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Home indicator</Label>
-      <Switch defaultChecked />
-    </div>
+    <OptionRow label="Show notch" defaultChecked />
+    <OptionRow label="Home indicator" defaultChecked />
   </div>
 );
 
 const IPadOptions = () => (
-  <div className="space-y-3 pt-1">
+  <div className="space-y-3">
     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">iPad options</p>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Home button</Label>
-      <Switch defaultChecked />
-    </div>
-    <div className="flex items-center justify-between">
-      <Label className="text-xs font-medium">Camera dot</Label>
-      <Switch defaultChecked />
-    </div>
+    <OptionRow label="Home button" defaultChecked />
+    <OptionRow label="Camera dot" defaultChecked />
   </div>
 );
 
@@ -134,7 +117,7 @@ export const DeviceContextOptions = ({
 }) => {
   if (device === "none") return null;
   return (
-    <div className="mt-4 rounded-xl border border-border/50 bg-card/60 p-3">
+    <div className="rounded-lg border hairline bg-secondary/40 p-3">
       {device === "browser"           && <BrowserOptions />}
       {device === "macos"             && <MacOSOptions />}
       {device === "iphone"            && <PhoneOptions label="iPhone" />}

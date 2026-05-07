@@ -56,12 +56,12 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={cn(
-        'relative flex flex-col items-center justify-center gap-3 p-6 rounded-xl border border-dashed transition-colors duration-150 cursor-pointer group bg-card/70',
+        'relative flex flex-col items-center justify-center gap-4 p-8 rounded-xl border border-dashed transition-colors duration-200 cursor-pointer group',
         isDragging
-          ? 'border-primary bg-primary/10 shadow-md shadow-primary/15'
+          ? 'border-foreground bg-secondary'
           : hasImage
-          ? 'border-primary/50 bg-primary/5 hover:border-primary/60'
-          : 'border-border/50 hover:border-primary/50 hover:bg-accent/20'
+          ? 'border-foreground/40 bg-secondary/40 hover:bg-secondary'
+          : 'hairline hover:border-foreground/30 hover:bg-secondary/60'
       )}
     >
       <input
@@ -72,28 +72,30 @@ export const ImageUpload = ({ onImageUpload, hasImage }: ImageUploadProps) => {
       />
       <div
         className={cn(
-          'p-3 rounded-full transition-colors duration-150 relative bg-accent/40',
+          'p-3 rounded-lg transition-colors duration-150',
           isDragging
-            ? 'bg-primary/15'
+            ? 'bg-foreground/10'
             : hasImage
-            ? 'bg-primary/10'
-            : 'group-hover:bg-primary/10'
+            ? 'bg-secondary'
+            : 'bg-secondary group-hover:bg-secondary/80'
         )}
       >
         {hasImage ? (
-          <CheckCircle className="w-6 h-6 text-primary" />
+          <CheckCircle className="w-6 h-6 text-foreground" />
         ) : isDragging ? (
-          <ImageIcon className="w-6 h-6 text-primary" />
+          <ImageIcon className="w-6 h-6 text-foreground" />
         ) : (
-          <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+          <Upload className="w-6 h-6 text-muted-foreground group-hover:text-foreground transition-colors" />
         )}
       </div>
       <div className="text-center">
-        <p className="font-medium text-sm text-foreground transition-colors">
+        <p className="font-medium text-sm text-foreground">
           {hasImage ? 'Replace screenshot' : isDragging ? 'Drop to upload' : 'Drop screenshot here'}
         </p>
-        <p className="text-xs text-muted-foreground mt-1 transition-colors">
-          {hasImage ? 'Click or drag a new file' : 'or click to browse • PNG, JPG, WebP • or Ctrl+V to paste'}
+        <p className="text-xs text-muted-foreground mt-1">
+          {hasImage
+            ? 'Click or drag a new file'
+            : 'or click to browse · PNG, JPG, WebP · or Ctrl+V to paste'}
         </p>
       </div>
     </div>

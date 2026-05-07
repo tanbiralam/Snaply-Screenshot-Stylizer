@@ -20,7 +20,7 @@ export const ThemeToggle = () => {
       size="icon"
       onClick={toggleTheme}
       aria-label="Toggle theme"
-      className="rounded-full border border-border/60 hover:border-primary/60"
+      className="rounded-lg border hairline hover:bg-secondary transition-colors"
     >
       {mounted && theme === "dark" ? (
         <Sun className="h-4 w-4" />

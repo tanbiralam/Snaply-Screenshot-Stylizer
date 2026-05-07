@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const CTA = () => {
   return (
-    <section id="cta" className="border-t hairline">
+    <section id="cta">
       <div className="container py-24 sm:py-32">
         <div className="relative overflow-hidden rounded-3xl border hairline bg-foreground text-background p-10 sm:p-16 text-center">
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-canvas opacity-30 blur-3xl rounded-full pointer-events-none" />

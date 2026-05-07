@@ -41,7 +41,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section id="features" className="border-t hairline">
+    <section id="features" >
       <div className="container py-20 sm:py-28">
         <div className="max-w-2xl mb-12">
           <p className="text-sm text-muted-foreground mb-3">What's inside</p>

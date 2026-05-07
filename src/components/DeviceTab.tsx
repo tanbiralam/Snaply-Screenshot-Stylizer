@@ -36,8 +36,8 @@ export const DeviceTab = ({ settings, onSettingsChange, imageAspectRatio }: Devi
     settings.deviceMockup !== "none" && isIncompat(settings.deviceMockup);
 
   const DeviceGrid = ({ devices, title }: { devices: DeviceMockup[]; title: string }) => (
-    <div>
-      <p className="mb-2.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+    <div className="space-y-2">
+      <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
         {title}
       </p>
       <div className="grid grid-cols-2 gap-2">
@@ -56,11 +56,11 @@ export const DeviceTab = ({ settings, onSettingsChange, imageAspectRatio }: Devi
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Recommendation banner */}
       {compatibility && (
-        <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+        <div className="flex items-start gap-2 rounded-lg border hairline bg-secondary/50 px-3 py-2.5">
+          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-foreground/70" />
           <p className="text-[11px] leading-relaxed text-foreground/80">
             {compatibility.recommendation}
           </p>
@@ -68,8 +68,8 @@ export const DeviceTab = ({ settings, onSettingsChange, imageAspectRatio }: Devi
       )}
 
       <DeviceGrid devices={WIDE_DEVICES}      title="Wide frames" />
-      <DeviceGrid devices={PORTRAIT_PHONES}   title="Phone frames · Portrait" />
-      <DeviceGrid devices={LANDSCAPE_PHONES}  title="Phone frames · Landscape" />
+      <DeviceGrid devices={PORTRAIT_PHONES}   title="Phone · Portrait" />
+      <DeviceGrid devices={LANDSCAPE_PHONES}  title="Phone · Landscape" />
 
       {/* Incompatibility warning for the currently selected device */}
       {selectedIsIncompat && (

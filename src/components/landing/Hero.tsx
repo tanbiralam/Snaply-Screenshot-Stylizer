@@ -4,7 +4,7 @@ import MockScreenshot from "./MockScreenshot";
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden border-b hairline">
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-paper-glow pointer-events-none" />
       <div className="container relative pt-14 pb-16 sm:pt-20 sm:pb-24">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">

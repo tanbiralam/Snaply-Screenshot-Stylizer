@@ -27,16 +27,17 @@ export const SettingsPanel = ({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Tab bar */}
-      <div className="mb-4 flex rounded-xl border border-border/50 bg-muted/30 p-1">
+      {/* Tab bar — clean underline style */}
+      <div className="flex shrink-0 border-b hairline">
         <button
           type="button"
           onClick={() => setActiveTab("style")}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium transition-all duration-150",
+            "flex flex-1 items-center justify-center gap-1.5 py-3 text-xs font-medium transition-colors duration-150",
+            "border-b-2 -mb-px",
             activeTab === "style"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "border-foreground text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           <Palette className="h-3.5 w-3.5" />
@@ -46,16 +47,17 @@ export const SettingsPanel = ({
           type="button"
           onClick={() => setActiveTab("device")}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium transition-all duration-150",
+            "flex flex-1 items-center justify-center gap-1.5 py-3 text-xs font-medium transition-colors duration-150",
+            "border-b-2 -mb-px",
             activeTab === "device"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "border-foreground text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           <Smartphone className="h-3.5 w-3.5" />
           Device
           {settings.deviceMockup !== "none" && (
-            <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-semibold text-primary-foreground">
+            <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground text-[9px] font-semibold text-background">
               1
             </span>
           )}
@@ -63,7 +65,7 @@ export const SettingsPanel = ({
       </div>
 
       {/* Tab content */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
         {activeTab === "style" ? (
           <StyleTab settings={settings} updateSetting={updateSetting} />
         ) : (

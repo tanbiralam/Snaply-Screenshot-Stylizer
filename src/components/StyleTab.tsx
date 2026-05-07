@@ -20,6 +20,7 @@ interface StyleTabProps {
 
 // ─── Reusable row primitives ──────────────────────────────────────────────────
 
+/** Thin, non-intrusive section label — matches landing page sidebar labels */
 const SectionLabel = ({ children }: { children: string }) => (
   <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
     {children}
@@ -43,10 +44,10 @@ const SliderRow = ({
   step: number;
   onChange: (v: number) => void;
 }) => (
-  <div className="space-y-2">
+  <div className="space-y-1.5">
     <div className="flex items-center justify-between">
       <Label className="text-xs font-medium">{label}</Label>
-      <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+      <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
         {value}{unit}
       </span>
     </div>
@@ -63,20 +64,20 @@ const ColorRow = ({
   value: string;
   onChange: (v: string) => void;
 }) => (
-  <div className="space-y-2">
+  <div className="space-y-1.5">
     <Label className="text-[10px] text-muted-foreground">{label}</Label>
     <div className="flex items-center gap-2">
       <input
         type="color"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 w-8 cursor-pointer appearance-none rounded border border-border bg-transparent"
+        className="h-8 w-8 cursor-pointer appearance-none rounded-lg border hairline bg-transparent"
       />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 rounded border border-input bg-background px-2 py-1 font-mono text-xs"
+        className="flex-1 rounded-lg border hairline bg-background px-2 py-1 font-mono text-xs"
       />
     </div>
   </div>
@@ -85,7 +86,7 @@ const ColorRow = ({
 // ─── Section: Layout ──────────────────────────────────────────────────────────
 
 const LayoutSection = ({ settings, updateSetting }: StyleTabProps) => (
-  <div className="space-y-4">
+  <div className="space-y-3">
     <SectionLabel>Layout</SectionLabel>
     <SliderRow
       label="Padding" value={settings.padding} unit="px"
@@ -108,7 +109,9 @@ const LayoutSection = ({ settings, updateSetting }: StyleTabProps) => (
         value={settings.aspectRatio}
         onValueChange={(v) => updateSetting("aspectRatio", v as StyleSettings["aspectRatio"])}
       >
-        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+        <SelectTrigger className="h-8 text-xs rounded-lg border hairline">
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value="auto">Auto</SelectItem>
           <SelectItem value="1:1">1:1 — Square</SelectItem>
@@ -146,7 +149,7 @@ const GradientDirectionPicker = ({
   <div className="space-y-1.5">
     <div className="flex items-center justify-between">
       <Label className="text-[10px] text-muted-foreground">Direction</Label>
-      <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+      <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
         {angle}°
       </span>
     </div>
@@ -155,7 +158,7 @@ const GradientDirectionPicker = ({
         if (dir.angle === -1) {
           return (
             <div key={i} className="flex h-7 w-full items-center justify-center">
-              <div className="h-1.5 w-1.5 rounded-full bg-border" />
+              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
             </div>
           );
         }
@@ -167,10 +170,10 @@ const GradientDirectionPicker = ({
             title={dir.label}
             onClick={() => onChange(dir.angle)}
             className={cn(
-              "flex h-7 w-full items-center justify-center rounded-lg text-sm transition-all duration-100",
+              "flex h-7 w-full items-center justify-center rounded-lg text-sm transition-colors duration-100",
               isActive
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "border border-border/50 bg-card/60 text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                ? "bg-foreground text-background"
+                : "border hairline text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
             {dir.arrow}
@@ -182,7 +185,7 @@ const GradientDirectionPicker = ({
 );
 
 const BackgroundSection = ({ settings, updateSetting }: StyleTabProps) => (
-  <div className="space-y-4">
+  <div className="space-y-3">
     <SectionLabel>Background</SectionLabel>
     <div className="flex items-center justify-between">
       <Label className="text-xs font-medium">Gradient</Label>
@@ -194,7 +197,7 @@ const BackgroundSection = ({ settings, updateSetting }: StyleTabProps) => (
     {settings.useGradient ? (
       <div className="space-y-3">
         <div
-          className="h-7 w-full rounded-lg border border-border/40"
+          className="h-7 w-full rounded-lg border hairline"
           style={{ background: `linear-gradient(${settings.gradientAngle ?? 135}deg, ${settings.gradientStart}, ${settings.gradientEnd})` }}
         />
         <GradientDirectionPicker
@@ -226,13 +229,13 @@ const EffectsSection = ({ settings, updateSetting }: StyleTabProps) => (
         onCheckedChange={(v) => updateSetting("blurBackground", v)}
       />
     </div>
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <div>
           <Label className="text-xs font-medium">Grain</Label>
           <p className="text-[10px] text-muted-foreground">Film texture on background only</p>
         </div>
-        <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+        <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
           {settings.grainIntensity}%
         </span>
       </div>
@@ -248,11 +251,9 @@ const EffectsSection = ({ settings, updateSetting }: StyleTabProps) => (
 // ─── Composed style tab ───────────────────────────────────────────────────────
 
 export const StyleTab = ({ settings, updateSetting }: StyleTabProps) => (
-  <div className="space-y-5">
+  <div className="space-y-6">
     <LayoutSection    settings={settings} updateSetting={updateSetting} />
-    <div className="h-px bg-border/60" />
     <BackgroundSection settings={settings} updateSetting={updateSetting} />
-    <div className="h-px bg-border/60" />
     <EffectsSection   settings={settings} updateSetting={updateSetting} />
   </div>
 );

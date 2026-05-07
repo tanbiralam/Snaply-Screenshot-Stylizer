@@ -1,6 +1,5 @@
 import BeforeAfter from "@/components/landing/BeforeAfter";
 import CTA from "@/components/landing/CTA";
-import Demo from "@/components/landing/Demo";
 import Features from "@/components/landing/Features";
 import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
@@ -13,9 +12,8 @@ export default function LandingPage() {
       <Nav />
       <main>
         <Hero />
-        <BeforeAfter />
         <Features />
-        <Demo />
+        <BeforeAfter />
         <UseCases />
         <CTA />
       </main>

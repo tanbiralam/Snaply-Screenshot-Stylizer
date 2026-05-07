@@ -9,8 +9,7 @@ import { SettingsPanel } from "@/components/SettingsPanel";
 import { StylePresets } from "@/components/StylePresets";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "sonner";
-import { Link, ImageIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ImageIcon } from "lucide-react";
 
 // ─── URL state encoding helpers ──────────────────────────────────────────────
 
@@ -126,50 +125,22 @@ export default function Home() {
     []
   );
 
-  const handleCopyLink = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied! Share it to apply these settings.");
-    } catch {
-      toast.error("Could not copy link — please copy the URL manually.");
-    }
-  }, []);
+
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       {/* ── Header ───────────────────────────────────────────────────────── */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/50 px-5">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-            <img className="w-5 h-5" src="/logo.png" alt="Snaply logo" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-foreground tracking-tight">
-              Snaply
-            </h1>
-            <p className="text-[11px] text-muted-foreground hidden sm:block leading-none">
-              Transform screenshots into stunning visuals
-            </p>
-          </div>
+      <header className="flex h-14 shrink-0 items-center justify-between border-b hairline px-5">
+        {/* Logo — mirrors landing Nav */}
+        <div className="flex items-center gap-2">
+          <span className="grid place-items-center w-7 h-7 rounded-lg bg-foreground text-background font-semibold text-sm">
+            S
+          </span>
+          <span className="font-semibold tracking-tight text-[15px]">Snaply</span>
         </div>
 
         {/* Header actions */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg border border-border/50 bg-card/60 px-3 py-1.5",
-              "text-xs font-medium text-muted-foreground transition-all duration-150",
-              "hover:border-border hover:bg-accent/30 hover:text-foreground"
-            )}
-            title="Copy shareable link with current settings"
-          >
-            <Link className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Copy link</span>
-          </button>
-
           <ThemeToggle />
         </div>
       </header>
@@ -177,7 +148,7 @@ export default function Home() {
       {/* ── Main layout: three columns ───────────────────────────────────── */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left panel — style presets */}
-        <aside className="hidden w-56 shrink-0 flex-col border-r border-border/50 lg:flex">
+        <aside className="hidden w-56 shrink-0 flex-col border-r hairline lg:flex">
           <div className="flex h-full flex-col overflow-y-auto p-3">
             <p className="mb-3 px-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               Presets
@@ -190,7 +161,7 @@ export default function Home() {
         </aside>
 
         {/* Center — canvas / upload area */}
-        <main className="flex min-w-0 flex-1 flex-col items-center justify-center overflow-hidden p-4 md:p-6 lg:p-8">
+        <main className="flex min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-secondary/20 p-4 md:p-6 lg:p-8">
           {image ? (
             <div className="flex h-full w-full flex-col items-center gap-4">
               {/* Canvas preview — fills available height */}
@@ -203,15 +174,11 @@ export default function Home() {
               </div>
 
               {/* Bottom action bar */}
-              <div className="flex shrink-0 items-center gap-3">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={() => { setImage(null); setImageAspectRatio(null); }}
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-lg border border-border/50 bg-card/60 px-3 py-2",
-                    "text-xs font-medium text-muted-foreground transition-all duration-150",
-                    "hover:border-border hover:bg-accent/30 hover:text-foreground"
-                  )}
+                  className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border hairline text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                 >
                   <ImageIcon className="h-3.5 w-3.5" />
                   Replace
@@ -228,7 +195,7 @@ export default function Home() {
         </main>
 
         {/* Right panel — settings (Style + Device tabs) */}
-        <aside className="hidden w-72 shrink-0 flex-col border-l border-border/50 xl:flex">
+        <aside className="hidden w-72 shrink-0 flex-col border-l hairline xl:flex">
           <div className="flex h-full flex-col overflow-y-auto">
             <SettingsPanel
               settings={settings}

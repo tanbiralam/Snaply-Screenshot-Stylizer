@@ -5,7 +5,6 @@ import {
   FileImage,
   ChevronDown,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,42 +104,47 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
   );
 
   return (
-    <div className="flex gap-2 w-full">
-      <Button
+    <div className="flex gap-1.5">
+      {/* Primary download button — matches landing CTA style */}
+      <button
+        type="button"
         onClick={() => handleExport(selectedFormat)}
         disabled={disabled || isExporting}
-        size="lg"
-        className="flex-1 gap-2 px-6 shadow-sm hover:shadow-md transition-colors duration-150 bg-primary text-primary-foreground hover:bg-primary/90"
+        className={cn(
+          "inline-flex items-center gap-2 h-9 px-5 rounded-lg bg-foreground text-background text-sm font-medium",
+          "hover:opacity-90 transition-opacity",
+          "disabled:opacity-40 disabled:cursor-not-allowed"
+        )}
       >
         {isExporting ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="relative">Exporting...</span>
+            Exporting...
           </>
         ) : lastExported === selectedFormat ? (
           <>
             <CheckCircle2 className="w-4 h-4" />
-            <span className="relative">Downloaded!</span>
+            Downloaded!
           </>
         ) : (
           <>
             <Download className="w-4 h-4" />
-            <span className="relative">
-              Download {selectedFormatOption?.label}
-            </span>
+            Download {selectedFormatOption?.label}
           </>
         )}
-      </Button>
+      </button>
 
+      {/* Format picker dropdown */}
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
+          <button
+            type="button"
             disabled={disabled || isExporting}
-            size="lg"
-            variant="outline"
             className={cn(
-              "gap-2 px-3 shadow-sm hover:shadow-md transition-colors duration-150 border-2",
-              dropdownOpen && "border-primary bg-primary/5"
+              "inline-flex items-center justify-center h-9 w-9 rounded-lg border hairline",
+              "text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors",
+              dropdownOpen && "bg-secondary text-foreground",
+              "disabled:opacity-40 disabled:cursor-not-allowed"
             )}
           >
             <ChevronDown
@@ -149,12 +153,12 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
                 dropdownOpen && "rotate-180"
               )}
             />
-          </Button>
+          </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
-          <DropdownMenuLabel className="flex items-center gap-2">
-            <FileImage className="w-4 h-4 text-primary" />
-            Export Format
+        <DropdownMenuContent align="end" className="w-52" sideOffset={8}>
+          <DropdownMenuLabel className="flex items-center gap-2 text-xs">
+            <FileImage className="w-3.5 h-3.5 text-muted-foreground" />
+            Export format
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           {formatOptions.map((format) => (
@@ -162,15 +166,15 @@ export const ExportButton = ({ onExport, disabled }: ExportButtonProps) => {
               key={format.value}
               onClick={() => handleExport(format.value)}
               className={cn(
-                "cursor-pointer transition-colors duration-200",
-                selectedFormat === format.value && "bg-primary/10"
+                "cursor-pointer transition-colors duration-150",
+                selectedFormat === format.value && "bg-secondary"
               )}
             >
-              <div className="flex flex-col gap-0.5 py-1">
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-medium">{format.label}</span>
+              <div className="flex flex-col gap-0.5 py-0.5">
+                <div className="flex items-center justify-between w-full gap-4">
+                  <span className="font-medium text-sm">{format.label}</span>
                   {selectedFormat === format.value && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-foreground/60" />
                   )}
                 </div>
                 <span className="text-xs text-muted-foreground">
