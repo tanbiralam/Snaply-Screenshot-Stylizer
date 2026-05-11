@@ -1,8 +1,22 @@
-export type { AspectRatio, DeviceMockup, StyleSettings } from "./settings";
+export type { AspectRatio, StyleSettings } from "./settings";
 export { defaultSettings } from "./settings";
 
 export type { Preset, PresetCategory } from "./presets";
 export { presets, presetCategories } from "./presets";
 
-export type { DeviceMockupOption } from "./devices";
+export type { DeviceMockup, DeviceMockupOption } from "./devices";
 export { deviceMockupOptions } from "./devices";
+
+export type {
+  EditorMode,
+  CodeSettings,
+  CodeLanguage,
+  CodeTheme,
+  CodeLanguageOption,
+  CodeThemeOption,
+} from "./code";
+export {
+  defaultCodeSettings,
+  codeLanguageOptions,
+  codeThemeOptions,
+} from "./code";
