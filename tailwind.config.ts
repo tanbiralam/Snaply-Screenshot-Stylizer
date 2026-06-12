@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
-  darkMode: ["class"],
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
@@ -32,6 +32,7 @@ export default {
                   DEFAULT: 'hsl(var(--destructive))',
                   foreground: 'hsl(var(--destructive-foreground))'
               },
+              warning: 'hsl(var(--warning))',
               muted: {
                   DEFAULT: 'hsl(var(--muted))',
                   foreground: 'hsl(var(--muted-foreground))'
@@ -59,7 +60,10 @@ export default {
                   ring: 'hsl(var(--sidebar-ring))'
               }
           },
+          /* --radius is 0.5rem: sm 4px, md 6px (buttons/inputs),
+             lg 8px (cards), xl 12px (modals) — per ui-context.md */
           borderRadius: {
+              xl: 'calc(var(--radius) + 4px)',
               lg: 'var(--radius)',
               md: 'calc(var(--radius) - 2px)',
               sm: 'calc(var(--radius) - 4px)'
@@ -120,42 +124,14 @@ export default {
               md: 'var(--shadow-md)',
               lg: 'var(--shadow-lg)',
               xl: 'var(--shadow-xl)',
-              '2xl': 'var(--shadow-2xl)'
+              '2xl': 'var(--shadow-2xl)',
+              card: 'var(--shadow-card)',
+              modal: 'var(--shadow-modal)'
           },
           fontFamily: {
-              sans: [
-                  'Poppins',
-                  'ui-sans-serif',
-                  'system-ui',
-                  '-apple-system',
-                  'BlinkMacSystemFont',
-                  'Segoe UI',
-                  'Roboto',
-                  'Helvetica Neue',
-                  'Arial',
-                  'Noto Sans',
-                  'sans-serif'
-              ],
-              serif: [
-                  'EB Garamond',
-                  'ui-serif',
-                  'Georgia',
-                  'Cambria',
-                  'Times New Roman',
-                  'Times',
-                  'serif'
-              ],
-              mono: [
-                  'Fira Code',
-                  'ui-monospace',
-                  'SFMono-Regular',
-                  'Menlo',
-                  'Monaco',
-                  'Consolas',
-                  'Liberation Mono',
-                  'Courier New',
-                  'monospace'
-              ]
+              sans: ['var(--font-sans)'],
+              serif: ['var(--font-serif)'],
+              mono: ['var(--font-mono)']
           }
       }
   },

@@ -19,7 +19,7 @@ const PresetSwatch = ({ preset }: { preset: Preset }) => {
   if (s.backgroundImage) {
     return (
       <span
-        className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-black/10 dark:ring-white/10 overflow-hidden"
+        className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-border overflow-hidden"
         style={{
           backgroundImage: `url(${s.backgroundImage})`,
           backgroundSize: "cover",
@@ -36,7 +36,7 @@ const PresetSwatch = ({ preset }: { preset: Preset }) => {
 
   return (
     <span
-      className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-black/10 dark:ring-white/10"
+      className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-border"
       style={{ background: bg }}
     />
   );

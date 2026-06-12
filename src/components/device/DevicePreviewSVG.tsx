@@ -2,7 +2,7 @@ import { DeviceMockup } from "@/types";
 
 /**
  * Mini SVG thumbnail for each device type, used inside DeviceCard.
- * Active state changes stroke, fill, and bar-fill colours to primary purple.
+ * Active state changes stroke, fill, and bar-fill colours to the accent.
  */
 export const DevicePreviewSVG = ({
   device,
@@ -11,9 +11,9 @@ export const DevicePreviewSVG = ({
   device: DeviceMockup;
   active: boolean;
 }) => {
-  const stroke  = active ? "#6c5ce7" : "currentColor";
-  const fill    = active ? "rgba(108,92,231,0.08)" : "transparent";
-  const barFill = active ? "rgba(108,92,231,0.12)" : "rgba(0,0,0,0.04)";
+  const stroke  = active ? "hsl(var(--primary))" : "currentColor";
+  const fill    = active ? "hsl(var(--primary) / 0.08)" : "transparent";
+  const barFill = active ? "hsl(var(--primary) / 0.12)" : "hsl(var(--foreground) / 0.04)";
 
   switch (device) {
     case "browser":

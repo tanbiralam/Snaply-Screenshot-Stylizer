@@ -79,7 +79,7 @@ export const CodeSettingsTab = ({
                 )}
               >
                 <span
-                  className="w-5 h-5 rounded-md flex-shrink-0 ring-1 ring-black/10 dark:ring-white/10"
+                  className="w-5 h-5 rounded-md flex-shrink-0 ring-1 ring-border"
                   style={{ backgroundColor: theme.bg }}
                 />
                 <span className="text-xs font-medium truncate">{theme.label}</span>

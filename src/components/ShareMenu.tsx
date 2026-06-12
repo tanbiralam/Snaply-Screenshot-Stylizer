@@ -27,7 +27,7 @@ const shareTargets: ShareTarget[] = [
     id: "x",
     label: "Share on X",
     icon: <XIcon className="w-4 h-4" />,
-    hoverColor: "hover:bg-[hsl(0,0%,8%)]/10 dark:hover:bg-[hsl(0,0%,95%)]/10",
+    hoverColor: "hover:bg-foreground/10",
     description: "Post to X (Twitter)",
     composeUrl: "https://x.com/intent/post?text=",
   },
@@ -127,7 +127,7 @@ export const ShareMenu = ({ onExport, disabled }: ShareMenuProps) => {
           title="Share"
         >
           {done ? (
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-4 h-4 text-primary" />
           ) : (
             <Share2 className="w-4 h-4" />
           )}
@@ -155,7 +155,7 @@ export const ShareMenu = ({ onExport, disabled }: ShareMenuProps) => {
               {busy === target.id ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : done === target.id ? (
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-4 h-4 text-primary" />
               ) : (
                 target.icon
               )}

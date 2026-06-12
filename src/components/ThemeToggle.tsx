@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
 export const ThemeToggle = () => {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   const toggleTheme = () => {
     if (!mounted) return;
-    setTheme(theme === "dark" ? "light" : "dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
       aria-label="Toggle theme"
       className="rounded-lg border hairline hover:bg-secondary transition-colors"
     >
-      {mounted && theme === "dark" ? (
+      {mounted && resolvedTheme === "dark" ? (
         <Sun className="h-4 w-4" />
       ) : (
         <Moon className="h-4 w-4" />

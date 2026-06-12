@@ -1,134 +1,97 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+/* EB Garamond remains only for the legacy landing page's serif display
+   (rebuilt in unit 3); UI fonts are Geist Sans/Mono via next/font. */
 @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/*
+  Jade design system (see context/ui-context.md).
+
+  Two layers of variables:
+  1. Semantic Jade tokens (hex) — the single source of color truth.
+  2. shadcn/ui HSL triplets — mapped from the Jade palette so generated
+     components inherit both themes with zero per-component edits.
+
+  Dark is the default theme; `:root` carries dark values so nothing is
+  unstyled before next-themes sets `data-theme`.
 */
 
 @layer base {
-  :root {
-    --background: 220 14% 97%;
-    --foreground: 220 22% 9%;
+  :root,
+  :root[data-theme="dark"] {
+    /* — Jade semantic tokens (dark) — */
+    --bg-base: #0e1311;
+    --bg-surface: #151c19;
+    --bg-elevated: #1b2420;
+    --bg-hover: #1f2a25;
+    --text-primary: #edf4f0;
+    --text-secondary: #bfcbc4;
+    --text-muted: #7e8e85;
+    --accent-primary: #3ddc97;
+    --accent-hover: #5be7aa;
+    --accent-foreground-token: #05291a;
+    --border-default: #25312b;
+    --border-strong: #36473e;
+    --state-error: #ff6b6b;
+    --state-success: #3ddc97;
+    --state-warning: #ffb224;
+    --ring-token: #3ddc97;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 22% 9%;
+    /* Shadows are a light-mode-only device; dark separates layers with
+       borders and elevation steps. */
+    --shadow-card: none;
+    --shadow-modal: none;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 22% 9%;
+    /* — shadcn/ui variable layer (HSL triplets from the Jade palette) — */
+    --background: 156 15% 6.5%; /* --bg-base */
+    --foreground: 146 24% 94.3%; /* --text-primary */
 
-    --primary: 246 65% 55%;
-    --primary-foreground: 220 33% 98%;
+    --card: 153 14% 12.4%; /* --bg-elevated */
+    --card-foreground: 146 24% 94.3%;
 
-    /* Light mode secondary: a soft cool-grey (was dark navy 30% L — caused dark panels in light mode) */
-    --secondary: 220 14% 91%;
-    --secondary-foreground: 220 22% 12%;
+    --popover: 153 14% 12.4%; /* --bg-elevated */
+    --popover-foreground: 146 24% 94.3%;
 
-    --muted: 220 14% 92%;
-    --muted-foreground: 220 16% 38%;
+    --primary: 154 69% 55%; /* --accent-primary */
+    --primary-foreground: 155 78% 9%; /* --accent-foreground */
 
-    --accent: 230 55% 94%;
-    --accent-foreground: 246 65% 55%;
+    --secondary: 154 14% 9.6%; /* --bg-surface */
+    --secondary-foreground: 146 24% 94.3%;
 
-    --destructive: 0 68% 52%;
-    --destructive-foreground: 0 0% 98%;
+    --muted: 154 14% 9.6%; /* --bg-surface */
+    --muted-foreground: 146 7% 52.5%; /* --text-muted */
 
-    /* Stronger border/hairline for visible structure in light mode */
-    --border: 220 14% 75%;
-    --hairline: 220 14% 75%;
-    --input: 220 14% 78%;
-    --ring: 246 65% 55%;
+    --accent: 153 15% 14.3%; /* --bg-hover */
+    --accent-foreground: 146 24% 94.3%;
 
-    --radius: 1.25rem;
+    --destructive: 0 100% 71%; /* --state-error */
+    --destructive-foreground: 156 15% 6.5%; /* dark ink on bright red */
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 22% 9%;
-    --sidebar-primary: 246 65% 55%;
-    --sidebar-primary-foreground: 220 33% 98%;
-    --sidebar-accent: 220 14% 91%;
-    --sidebar-accent-foreground: 220 22% 12%;
-    --sidebar-border: 220 14% 75%;
-    --sidebar-ring: 246 65% 55%;
-    --chart-1: 234 89% 73%;
-    --chart-2: 255 91% 76%;
-    --chart-3: 270 95% 75%;
-    --chart-4: 238 83% 66%;
-    --chart-5: 0 0% 45%;
-    --sidebar: 0 0% 100%;
+    --warning: 39 100% 57%; /* --state-warning */
 
-    --font-sans: 'Poppins', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    --border: 150 14% 17%; /* --border-default */
+    --hairline: 150 14% 17%;
+    --input: 150 14% 17%;
+    --ring: 154 69% 55%;
 
-    --font-serif: 'EB Garamond', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    --radius: 0.5rem; /* cards 8px, buttons/inputs 6px, small UI 4px */
 
-    --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --sidebar-background: 154 14% 9.6%;
+    --sidebar-foreground: 146 24% 94.3%;
+    --sidebar-primary: 154 69% 55%;
+    --sidebar-primary-foreground: 155 78% 9%;
+    --sidebar-accent: 153 15% 14.3%;
+    --sidebar-accent-foreground: 146 24% 94.3%;
+    --sidebar-border: 150 14% 17%;
+    --sidebar-ring: 154 69% 55%;
 
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+    --font-sans: var(--font-geist-sans), system-ui, -apple-system,
+      "Segoe UI", Roboto, sans-serif;
+    --font-serif: "EB Garamond", ui-serif, Georgia, serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular,
+      Menlo, Consolas, monospace;
 
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-
-    --tracking-normal: 0em;
-
-    --spacing: 0.25rem;
-  }
-
-  .dark {
-    --background: 220 18% 10%;
-    --foreground: 220 33% 96%;
-
-    --card: 220 15% 13%;
-    --card-foreground: 220 33% 96%;
-
-    --popover: 220 18% 12%;
-    --popover-foreground: 220 33% 96%;
-
-    --primary: 247 63% 62%;
-    --primary-foreground: 220 44% 12%;
-
-    --secondary: 220 12% 26%;
-    --secondary-foreground: 220 33% 96%;
-
-    --muted: 220 12% 40%;
-    --muted-foreground: 220 25% 80%;
-
-    --accent: 220 14% 18%;
-    --accent-foreground: 247 63% 62%;
-
-    --destructive: 0 72% 56%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 12% 22%;
-    --hairline: 220 12% 22%;
-    --input: 220 12% 22%;
-    --ring: 247 63% 62%;
-    --sidebar-background: 220 15% 13%;
-    --sidebar-foreground: 220 33% 96%;
-    --sidebar-primary: 247 63% 62%;
-    --sidebar-primary-foreground: 220 44% 12%;
-    --sidebar-accent: 220 12% 26%;
-    --sidebar-accent-foreground: 220 33% 96%;
-    --sidebar-border: 220 12% 22%;
-    --sidebar-ring: 247 63% 62%;
-    --chart-1: 230 80% 70%;
-    --chart-2: 251 77% 68%;
-    --chart-3: 195 74% 60%;
-    --chart-4: 166 64% 54%;
-    --chart-5: 343 68% 58%;
-    --sidebar: 220 15% 13%;
     --shadow-2xs: 0 1px 2px 0px hsl(0 0% 0% / 0.2);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.2);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.24);
@@ -137,6 +100,90 @@ All colors MUST be HSL.
     --shadow-lg: 0 8px 20px -8px hsl(0 0% 0% / 0.4);
     --shadow-xl: 0 10px 30px -12px hsl(0 0% 0% / 0.45);
     --shadow-2xl: 0 18px 45px -15px hsl(0 0% 0% / 0.5);
+
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+  }
+
+  :root[data-theme="light"] {
+    /* — Jade semantic tokens (light) — */
+    --bg-base: #fafdfb;
+    --bg-surface: #eff4f0;
+    --bg-elevated: #ffffff;
+    --bg-hover: #e6ede8;
+    --text-primary: #15201a;
+    --text-secondary: #3e4a43;
+    --text-muted: #6b7a70;
+    --accent-primary: #0b8a5c;
+    --accent-hover: #09744d;
+    --accent-foreground-token: #ffffff;
+    --border-default: #dee7e0;
+    --border-strong: #c6d4c9;
+    --state-error: #c92a2a;
+    --state-success: #0b8a5c;
+    --state-warning: #b45309;
+    --ring-token: #0b8a5c;
+
+    --shadow-card: 0 1px 2px rgba(21, 32, 26, 0.06),
+      0 1px 3px rgba(21, 32, 26, 0.1);
+    --shadow-modal: 0 8px 24px rgba(21, 32, 26, 0.12),
+      0 2px 6px rgba(21, 32, 26, 0.08);
+
+    /* — shadcn/ui variable layer — */
+    --background: 140 43% 98.6%; /* --bg-base */
+    --foreground: 147 21% 10.4%; /* --text-primary */
+
+    --card: 0 0% 100%; /* --bg-elevated */
+    --card-foreground: 147 21% 10.4%;
+
+    --popover: 0 0% 100%; /* --bg-elevated */
+    --popover-foreground: 147 21% 10.4%;
+
+    --primary: 158 85% 29%; /* --accent-primary */
+    --primary-foreground: 0 0% 100%; /* --accent-foreground */
+
+    --secondary: 132 19% 94.7%; /* --bg-surface */
+    --secondary-foreground: 147 21% 10.4%;
+
+    --muted: 132 19% 94.7%; /* --bg-surface */
+    --muted-foreground: 140 7% 45%; /* --text-muted */
+
+    --accent: 137 16% 91.6%; /* --bg-hover */
+    --accent-foreground: 147 21% 10.4%;
+
+    --destructive: 0 65% 48%; /* --state-error */
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 26 90% 37%; /* --state-warning */
+
+    --border: 133 16% 88.8%; /* --border-default */
+    --hairline: 133 16% 88.8%;
+    --input: 133 16% 88.8%;
+    --ring: 158 85% 29%;
+
+    --sidebar-background: 132 19% 94.7%;
+    --sidebar-foreground: 147 21% 10.4%;
+    --sidebar-primary: 158 85% 29%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 137 16% 91.6%;
+    --sidebar-accent-foreground: 147 21% 10.4%;
+    --sidebar-border: 133 16% 88.8%;
+    --sidebar-ring: 158 85% 29%;
+
+    /* Light shadows use jade-tinted ink, never pure black. */
+    --shadow-2xs: 0 1px 3px 0px hsl(147 21% 10% / 0.05);
+    --shadow-xs: 0 1px 3px 0px hsl(147 21% 10% / 0.05);
+    --shadow-sm: 0 1px 3px 0px hsl(147 21% 10% / 0.1),
+      0 1px 2px -1px hsl(147 21% 10% / 0.1);
+    --shadow: 0 1px 3px 0px hsl(147 21% 10% / 0.1),
+      0 1px 2px -1px hsl(147 21% 10% / 0.1);
+    --shadow-md: 0 1px 3px 0px hsl(147 21% 10% / 0.1),
+      0 2px 4px -1px hsl(147 21% 10% / 0.1);
+    --shadow-lg: 0 1px 3px 0px hsl(147 21% 10% / 0.1),
+      0 4px 6px -1px hsl(147 21% 10% / 0.1);
+    --shadow-xl: 0 1px 3px 0px hsl(147 21% 10% / 0.1),
+      0 8px 10px -1px hsl(147 21% 10% / 0.1);
+    --shadow-2xl: 0 1px 3px 0px hsl(147 21% 10% / 0.25);
   }
 }
 
@@ -152,16 +199,20 @@ All colors MUST be HSL.
   .bg-paper-glow {
     background:
       radial-gradient(circle at 20% 15%, hsl(var(--primary) / 0.14), transparent 34%),
-      radial-gradient(circle at 82% 12%, hsl(166 64% 54% / 0.12), transparent 30%),
+      radial-gradient(circle at 82% 12%, hsl(var(--primary) / 0.08), transparent 30%),
       linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
   }
 
   .bg-gradient-canvas {
-    background: linear-gradient(135deg, hsl(246 65% 55%), hsl(195 74% 60%));
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
   }
 
   .bg-gradient-canvas-soft {
-    background: linear-gradient(135deg, hsl(247 63% 62% / 0.85), hsl(166 64% 54% / 0.85));
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent-primary) 85%, transparent),
+      color-mix(in srgb, var(--accent-hover) 85%, transparent)
+    );
   }
 
   .shadow-soft {
@@ -248,6 +299,16 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  /* Theme switch: colors transition at 200ms ease-in-out (motion table).
+     Zero-specificity default — any explicit transition utility wins. */
+  *,
+  ::before,
+  ::after {
+    transition-property: color, background-color, border-color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
@@ -258,5 +319,16 @@ All colors MUST be HSL.
 
   button, a, input, select {
     @apply transition-colors duration-200;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

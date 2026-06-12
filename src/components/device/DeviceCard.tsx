@@ -36,13 +36,13 @@ export const DeviceCard = ({
     {active && (
       <span className="absolute right-2 top-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-foreground">
         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-          <polyline points="1.5,4 3,5.5 6.5,2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points="1.5,4 3,5.5 6.5,2" stroke="hsl(var(--background))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
     )}
     {incompatible && !active && (
-      <span className="absolute right-1.5 top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500/90">
-        <AlertTriangle className="h-2.5 w-2.5 text-white" />
+      <span className="absolute right-1.5 top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-warning/90">
+        <AlertTriangle className="h-2.5 w-2.5 text-background" />
       </span>
     )}
     <DevicePreviewSVG device={device} active={active} />
