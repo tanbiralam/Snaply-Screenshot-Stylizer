@@ -9,9 +9,15 @@ change.
 
 ## Current Goal
 
-- Units 1–3 complete. Next is Unit 4 (/tools directory).
+- Units 1–3.5 complete. Next is Unit 4 (/tools directory).
 
 ## Completed
+
+- **Unit 3.5 — Landing page expansion** (2026-06-13)
+  - New landing sections in `src/components/landing/` (all server components, zero image assets, DOM-composed and theme-aware): `MockWindow` (reusable mock app window), `HeroVisual` (BEFORE/AFTER illustration — flat window vs jade-gradient backdrop with padding/radius/`shadow-modal`), `HowItWorks` (3 mono-numbered steps), `StylizerSpotlight` (two alternating rows: preset tiles labeled with real preset names imported from `src/types/presets.ts` by id — Aurora, Glassmorphism, Sunset — and a non-functional token-styled mock settings panel; CTA `Open {tool.name}` → `toolPath`), `PrivacyComparison` (upload→their-server→download flow vs in-tab browser frame with accent border; the 3 value props as compact items beneath), `Faq` (6 native `<details>` items + FAQPage JSON-LD generated from the same array), `FinalCta`.
+  - Final page order verified in rendered HTML: navbar → hero + visual → how it works → featured grid → pill strip → spotlight → privacy comparison → FAQ → final CTA → footer.
+  - Claims kept truthful: 2x export verified against `CanvasRenderer.exportImage` (scales ×2); preset names resolve from the presets module so renames flow through; no statistics, testimonials, or badges.
+  - Verified: build passes; smoke test confirms ascending section order, valid FAQPage JSON-LD (6 questions matching the rendered `<details>`), preset names in copy; greps confirm tool names only in the registry, branding only via `site.ts`, no hex/raw grays in the new components.
 
 - **Unit 3 — Landing page rebuild** (2026-06-13)
   - Carry-over fixes: `Tool.featured?: boolean` + `getFeaturedTools()` added to the registry (featured = screenshot, redact, remove-background, compress); theme provider switched to `defaultTheme="system"`; `src/lib/site.ts` created as the single branding source (`{ name, tagline, description, url }`).

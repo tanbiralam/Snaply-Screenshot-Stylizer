@@ -1,35 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ShieldCheck, Infinity as InfinityIcon, UserX } from "lucide-react";
 import { site } from "@/lib/site";
 import { getFeaturedTools, getTool, toolPath, tools } from "@/lib/registry/tools";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToolCard } from "@/components/ToolCard";
 import { ToolPill } from "@/components/ToolPill";
+import { HeroVisual } from "@/components/landing/HeroVisual";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { StylizerSpotlight } from "@/components/landing/StylizerSpotlight";
+import { PrivacyComparison } from "@/components/landing/PrivacyComparison";
+import { Faq } from "@/components/landing/Faq";
+import { FinalCta } from "@/components/landing/FinalCta";
 
 export const metadata: Metadata = {
   description: site.description,
   alternates: { canonical: "/" },
 };
-
-const valueProps = [
-  {
-    icon: ShieldCheck,
-    title: "Nothing ever uploads",
-    body: "Every tool processes your images locally on your device. There is no server to send them to.",
-  },
-  {
-    icon: InfinityIcon,
-    title: "Free forever",
-    body: "No usage limits, no paywalls, no ads. Every tool is fully available to everyone.",
-  },
-  {
-    icon: UserX,
-    title: "No account needed",
-    body: "Open a tool and start working. No signup, no login, no email.",
-  },
-];
 
 export default function LandingPage() {
   const featured = getFeaturedTools();
@@ -41,7 +28,7 @@ export default function LandingPage() {
       <Navbar />
 
       <main>
-        {/* Hero */}
+        {/* Hero + product visual */}
         <section className="mx-auto max-w-content px-4 py-20 md:px-6">
           <p className="font-mono text-2xs font-medium uppercase tracking-wider text-muted-foreground">
             Free · Private · In-browser
@@ -69,9 +56,13 @@ export default function LandingPage() {
               </Link>
             )}
           </div>
+
+          <HeroVisual />
         </section>
 
-        {/* Featured tools */}
+        <HowItWorks />
+
+        {/* Featured tools + pill strip */}
         <section
           id="tools"
           className="mx-auto max-w-content scroll-mt-14 px-4 py-20 md:px-6"
@@ -94,31 +85,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Privacy / free-forever */}
-        <section className="mx-auto max-w-content px-4 py-20 md:px-6">
-          <p className="font-mono text-2xs font-medium uppercase tracking-wider text-muted-foreground">
-            Privacy
-          </p>
-          <h2 className="mt-4 text-3xl font-bold">
-            Private by architecture, not by policy
-          </h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {valueProps.map(({ icon: Icon, title, body }) => (
-              <div
-                key={title}
-                className="flex flex-col gap-3 rounded-lg border bg-card p-5"
-              >
-                <Icon
-                  className="h-5 w-5 text-primary"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                <h3 className="text-lg font-medium">{title}</h3>
-                <p className="text-sm text-muted-foreground">{body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <StylizerSpotlight />
+
+        <PrivacyComparison />
+
+        <Faq />
+
+        <FinalCta />
       </main>
 
       <Footer />
