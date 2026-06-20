@@ -18,7 +18,7 @@ export function HowItWorks() {
         {steps.map((step, i) => (
           <li
             key={step.lead}
-            className="flex flex-col gap-3 rounded-lg border bg-card p-5"
+            className="flex flex-col gap-3 rounded-lg border bg-card p-5 transition-[border-color,box-shadow] duration-120 ease-out hover:border-strong hover:shadow-card"
           >
             <span className="font-mono text-sm font-medium text-primary">
               {String(i + 1).padStart(2, "0")}

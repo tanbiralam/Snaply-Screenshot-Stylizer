@@ -55,7 +55,7 @@ export function Faq() {
         {faqs.map((faq) => (
           <details
             key={faq.question}
-            className="group rounded-lg border bg-card px-5 py-4"
+            className="group rounded-lg border bg-card px-5 py-4 transition-[border-color,box-shadow] duration-120 ease-out hover:border-strong hover:shadow-card"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-medium [&::-webkit-details-marker]:hidden">
               {faq.question}

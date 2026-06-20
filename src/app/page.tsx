@@ -24,7 +24,15 @@ export default function LandingPage() {
   const screenshotTool = getTool("create", "screenshot");
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div
+      className="min-h-screen bg-background text-foreground"
+      style={{
+        // ponytail: CSS dot grid, no asset/dep; --border keeps it theme-aware
+        backgroundImage:
+          "radial-gradient(hsl(var(--border)) 1px, transparent 1px)",
+        backgroundSize: "22px 22px",
+      }}
+    >
       <Navbar />
 
       <main>

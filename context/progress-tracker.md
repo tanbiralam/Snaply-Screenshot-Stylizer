@@ -13,6 +13,11 @@ change.
 
 ## Completed
 
+- **Landing visual polish** (2026-06-20)
+  - `HeroVisual` rewritten to use real product imagery (`public/landing/hero-before.png` 1496×960, `hero-after.png` 3376×2304) via `next/image` (first use of next/image in the app; `priority` + `sizes` cap the 3.4MB after-PNG). Replaced the gray `MockWindow` before/after — now an overlapping editorial composition: styled "after" dominant, flat "before" tucked tilted (`-rotate-3`) into the corner. A wipe-slider was rejected because the two images aren't co-framed (the after reframes the screenshot onto a backdrop) so content would jump.
+  - Visual texture: subtle CSS dot grid (`radial-gradient(hsl(var(--border)) 1px, transparent 1px)`, 22px) on the page root in `src/app/page.tsx` — theme-aware, no asset/dep. Runs uniformly across all sections; section-level `bg-secondary` bands were tried then removed because they covered the dots and read as inconsistent. Cards/panels (`bg-card`) inside sections are kept as raised surfaces over the dots.
+  - `MockWindow` still used by the spotlight preset tiles (abstract style swatches — acceptable there). Typecheck passes.
+
 - **Unit 3.5 — Landing page expansion** (2026-06-13)
   - New landing sections in `src/components/landing/` (all server components, zero image assets, DOM-composed and theme-aware): `MockWindow` (reusable mock app window), `HeroVisual` (BEFORE/AFTER illustration — flat window vs jade-gradient backdrop with padding/radius/`shadow-modal`), `HowItWorks` (3 mono-numbered steps), `StylizerSpotlight` (two alternating rows: preset tiles labeled with real preset names imported from `src/types/presets.ts` by id — Aurora, Glassmorphism, Sunset — and a non-functional token-styled mock settings panel; CTA `Open {tool.name}` → `toolPath`), `PrivacyComparison` (upload→their-server→download flow vs in-tab browser frame with accent border; the 3 value props as compact items beneath), `Faq` (6 native `<details>` items + FAQPage JSON-LD generated from the same array), `FinalCta`.
   - Final page order verified in rendered HTML: navbar → hero + visual → how it works → featured grid → pill strip → spotlight → privacy comparison → FAQ → final CTA → footer.
