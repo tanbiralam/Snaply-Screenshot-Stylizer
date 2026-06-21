@@ -105,6 +105,14 @@ export default {
             'pulse-soft': {
                 '0%, 100%': { opacity: '1' },
                 '50%': { opacity: '0.8' }
+            },
+            /* A packet travelling from the source file to the target file,
+               used by the convert animation on each card while encoding. */
+            'travel': {
+                '0%': { left: '0%', opacity: '0', transform: 'translate(-50%, -50%) scale(0.6)' },
+                '20%': { opacity: '1', transform: 'translate(-50%, -50%) scale(1)' },
+                '80%': { opacity: '1', transform: 'translate(-50%, -50%) scale(1)' },
+                '100%': { left: '100%', opacity: '0', transform: 'translate(-50%, -50%) scale(0.6)' }
             }
         },
         animation: {
@@ -116,7 +124,8 @@ export default {
             'slide-down': 'slide-down 0.5s ease-out',
             'shimmer': 'shimmer 2s infinite',
             'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
-            'pulse-soft': 'pulse-soft 2s ease-in-out infinite'
+            'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+            'travel': 'travel 1.4s ease-in-out infinite'
         },
           boxShadow: {
               '2xs': 'var(--shadow-2xs)',

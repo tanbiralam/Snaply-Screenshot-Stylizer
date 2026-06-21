@@ -1,6 +1,6 @@
 import Image from "next/image";
-import heroAfter from "../../../public/landing/hero-after.png";
-import heroBefore from "../../../public/landing/hero-before.png";
+import heroAfter from "../../../public/landing/hero-after.webp";
+import heroBefore from "../../../public/landing/hero-before.webp";
 
 /**
  * Real before/after of the Stylizer: the flat source screenshot (before)
