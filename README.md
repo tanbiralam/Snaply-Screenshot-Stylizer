@@ -59,7 +59,7 @@ src/
 │   ├── not-found.tsx          # 404 fallback page
 │   └── providers.tsx          # React context providers
 ├── components/
-│   ├── ui/                    # shadcn/ui components (button, slider, etc.)
+│   ├── ui/                    # shadcn/ui components (button, slider, etc)
 │   ├── CanvasRenderer.tsx     # Core canvas rendering with effects
 │   ├── ExportButton.tsx       # Format selection & download
 │   ├── ImageUpload.tsx        # Drag & drop image upload
