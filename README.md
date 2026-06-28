@@ -54,7 +54,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 src/
 ├── app/
-│   ├── layout.tsx             # Root layout with metadata & providers
+│   ├── layout.tsx             # Root layout with metadata
 │   ├── page.tsx               # Main application page
 │   ├── not-found.tsx          # 404 fallback page
 │   └── providers.tsx          # React context providers (theme, tooltip, toaster)
@@ -79,12 +79,12 @@ src/
 
 ## Available Scripts
 
-| Command           | Description                              |
-| ----------------- | ---------------------------------------- |
-| `npm run dev`     | Start development server with hot reload |
-| `npm run build`   | Production build (optimized)             |
-| `npm run start`   | Start production server locally          |
-| `npm run lint`    | Run ESLint on the codebase               |
+| Command         | Description                              |
+| --------------- | ---------------------------------------- |
+| `npm run dev`   | Start development server with hot reload |
+| `npm run build` | Production build (optimized)             |
+| `npm run start` | Start production server locally          |
+| `npm run lint`  | Run ESLint on the codebase               |
 
 ## Core Components
 
